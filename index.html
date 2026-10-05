@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mermaid Times">
+<meta name="theme-color" content="#E7F6F7">
+<title>Mermaid Times</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: one phone-width column of white cards on a pale lagoon ground; a single light sea look on purpose. */
+:root{
+  color-scheme: light;
+  --lagoon:#E7F6F7; --mist:#F4F8F9; --card:#FFFFFF; --deep:#123B57;
+  --ink:#123B57; --ink-soft:#3F6178;
+  --teal:#0E7480; --teal-deep:#0A5660; --foam:#C6EEE8; --foam-ink:#0A5660; --learn:#A8DCD8;
+  --coral:#C9452F; --coral-deep:#8E2E1F; --coral-tint:#FDE3DC;
+  --sand:#FFF1D6; --sand-ink:#7A5A12; --gold:#F2B630;
+  --pearl:#F7D6E0; --pearl-ink:#8C2F5A; --lilac:#6D4BB8;
+  --unseen:#E3EAEE; --unseen-ink:#7B8B96;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%}
+body{margin:0;background:var(--lagoon);color:var(--ink);font-family:var(--body);font-size:16px;-webkit-tap-highlight-color:transparent}
+body.mist{background:var(--mist)}
+body.deep{background:var(--deep)}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+.app{max-width:440px;margin:0 auto;min-height:100%;box-sizing:border-box;padding-inline:16px;padding-block:18px 22px;display:flex;flex-direction:column;gap:14px}
+.app>*{min-width:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top h1{flex:1;margin:0;text-align:center;font-family:var(--display);font-weight:700;font-size:22px;line-height:1.1}
+.icon-btn{border:0;cursor:pointer;width:44px;height:44px;flex-shrink:0;border-radius:22px;background:var(--card);display:flex;align-items:center;justify-content:center}
+.pill{background:var(--card);border-radius:18px;padding:8px 12px;font-weight:800;font-size:14px;white-space:nowrap;display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.card{background:var(--card);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card.raised{box-shadow:0 6px 0 var(--foam)}
+.card h2{margin:0;font-size:16px;font-weight:800}
+.muted{color:var(--ink-soft);font-size:14px;margin:0;line-height:1.4}
+.small{font-size:13px}
+
+/* home */
+.hello{display:flex;align-items:center;gap:10px;font-weight:800;min-width:0}
+.hello span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avatar{width:44px;height:44px;border-radius:22px;background:var(--pearl);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand{text-align:center}
+.brand h1{margin:0;font-family:var(--display);font-weight:800;font-size:42px;line-height:1;color:var(--teal)}
+.brand p{margin:2px 0 0;color:var(--ink-soft);font-size:15px}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center}
+.week div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.week .dot{width:38px;height:38px;border-radius:19px;background:var(--lagoon);display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.week .dot.done{background:var(--teal)}
+.week .dot.today{border:2px dashed var(--coral);background:var(--coral-tint)}
+.week .dot.today.done{border:0;background:var(--teal)}
+.week span{font-size:12px;font-weight:800;color:var(--ink-soft)}
+.week span.on{color:var(--ink)}
+.treasure{display:flex;align-items:center;gap:10px;background:var(--sand);border-radius:16px;padding:10px 12px;font-size:14px;line-height:1.35}
+.treasure.won{background:var(--coral);color:#fff}
+.menu{border:0;cursor:pointer;text-align:left;width:100%;background:var(--card);border-radius:22px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 5px 0 var(--foam)}
+.menu .ico{width:50px;height:50px;border-radius:16px;background:var(--foam);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.menu .txt{flex:1;display:flex;flex-direction:column;min-width:0}
+.menu .name{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.15}
+.menu .desc{font-size:14px;color:var(--ink-soft)}
+.menu.teal{background:var(--teal);color:#fff;box-shadow:0 5px 0 var(--teal-deep)}
+.menu.teal .ico{background:#fff}
+.menu.teal .desc{color:#D9F3F1}
+.menu.pink{box-shadow:0 5px 0 #F3C4D0}
+.menu.pink .ico{background:var(--pearl)}
+.link-btn{border:0;background:none;cursor:pointer;font-weight:800;font-size:14px;color:var(--teal);padding:10px 16px;align-self:center;margin-top:auto;min-height:44px}
+
+/* question */
+.qcard{background:var(--card);border-radius:28px;padding:20px 16px;box-shadow:0 6px 0 var(--foam);display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;overflow:hidden}
+.qcard .deco{position:absolute;left:16px;top:14px}
+.qcard .deco2{position:absolute;right:20px;top:18px}
+.q{font-family:var(--display);font-weight:800;font-size:62px;line-height:1;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.groups{font-size:15px;font-weight:700;color:var(--ink-soft);min-height:21px;transition:opacity .3s}
+.ans{margin-top:8px;min-width:150px;height:64px;border-radius:18px;border:3px solid var(--teal);box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--display);font-weight:800;font-size:40px;font-variant-numeric:tabular-nums;padding:0 14px}
+.ans .caret{display:inline-block;width:3px;height:34px;background:var(--teal);animation:blink 1s steps(1) infinite}
+.ans.ok{background:var(--teal);border-color:var(--teal);color:#fff;animation:pop .3s}
+.ans.no{background:var(--coral);border-color:var(--coral);color:#fff}
+@keyframes blink{50%{opacity:0}}
+@keyframes pop{40%{transform:scale(1.08)}}
+.fb{border-radius:18px;padding:12px 14px;font-size:15px;line-height:1.4}
+.fb.ok{background:#D7F0EC;color:var(--foam-ink)}
+.fb.no{background:var(--coral-tint);color:var(--coral-deep)}
+.fb b{font-weight:800}
+.pad{margin-top:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pad button{border:0;cursor:pointer;height:56px;border-radius:18px;background:var(--card);box-shadow:0 4px 0 var(--foam);font-family:var(--display);font-weight:700;font-size:28px;display:flex;align-items:center;justify-content:center}
+.pad button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--foam)}
+.pad .del{background:var(--pearl);box-shadow:0 4px 0 #EDB9C8}
+.pad .go{background:var(--teal);color:#fff;box-shadow:0 4px 0 var(--teal-deep);font-family:var(--body);font-weight:800;font-size:18px}
+.bar{height:12px;border-radius:6px;background:var(--foam);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:var(--teal);width:100%}
+.prog-row{display:flex;justify-content:space-between;font-weight:800;font-size:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{border:0;cursor:pointer;padding:8px 14px;border-radius:16px;background:var(--card);font-weight:800;font-size:14px;min-height:40px}
+.chip.on{background:var(--teal);color:#fff}
+.tablegrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tbtn{border:0;cursor:pointer;background:var(--card);border-radius:20px;padding:10px 0;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 4px 0 var(--foam)}
+.tbtn .n{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.1}
+.tbtn .b{font-size:12px;font-weight:800;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.tbtn.on{background:var(--teal);color:#fff;box-shadow:0 4px 0 var(--teal-deep)}
+.tbtn.on .b{color:#D9F3F1}
+.tbtn.sel{outline:3px solid var(--gold);outline-offset:3px}
+.seg{display:flex;background:var(--card);border-radius:22px;padding:4px}
+.seg button{border:0;cursor:pointer;flex:1;min-height:42px;border-radius:18px;background:transparent;font-weight:800;font-size:15px}
+.seg button.on{background:var(--deep);color:#fff}
+.stat3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center}
+.stat3 div{background:var(--lagoon);border-radius:14px;padding:8px 0}
+.stat3 strong{display:block;font-family:var(--display);font-weight:800;font-size:22px;line-height:1.2;font-variant-numeric:tabular-nums}
+.stat3 span{font-size:12px;color:var(--ink-soft)}
+.stat3 .hot{background:var(--coral-tint)}
+.stat3 .hot strong{color:var(--coral)}
+.stat3 .hot span{color:var(--coral-deep)}
+.tag{display:inline-block;padding:6px 10px;border-radius:12px;font-weight:800;font-size:14px;background:var(--coral-tint);color:var(--coral-deep)}
+.tag.slow{background:var(--sand);color:var(--sand-ink)}
+.tag.free{background:var(--card);color:var(--ink)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.btn{border:0;cursor:pointer;min-height:54px;border-radius:20px;background:var(--card);font-weight:800;font-size:16px;color:var(--teal-deep);display:flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:0 12px}
+.btn.coral{background:var(--coral);color:#fff;box-shadow:0 5px 0 var(--coral-deep)}
+.btn.teal{background:var(--teal);color:#fff;box-shadow:0 5px 0 var(--teal-deep)}
+.btn.gold{background:var(--gold);color:var(--deep)}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn-row{display:flex;gap:12px;margin-top:auto}
+
+/* results */
+.res{align-items:center;text-align:center}
+.res .title{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;color:var(--teal);margin:0}
+.res .score{font-family:var(--display);font-weight:800;font-size:60px;line-height:1;font-variant-numeric:tabular-nums}
+.badge{background:var(--coral);color:#fff;border-radius:16px;padding:8px 14px;font-weight:800;font-size:15px}
+.badge.soft{background:var(--card);color:var(--ink)}
+.banner{width:100%;box-sizing:border-box;background:var(--teal);color:#fff;border-radius:20px;padding:14px 16px;font-weight:800;font-size:15px}
+.banner.soft{background:var(--foam);color:var(--foam-ink)}
+.wide{width:100%;box-sizing:border-box;text-align:left}
+
+/* tricky */
+.fish{background:var(--card);border-radius:20px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.fish .fact{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1}
+.fish .why{font-size:13px;color:var(--ink-soft)}
+.fish .txt{flex:1;display:flex;flex-direction:column;min-width:0}
+.dots3{display:flex;gap:4px}
+.dots3 i{width:14px;height:14px;border-radius:7px;background:var(--unseen)}
+.dots3 i.on{background:var(--teal)}
+.empty{text-align:center;padding:30px 16px;background:var(--card);border-radius:24px}
+.empty b{font-family:var(--display);font-size:24px;display:block}
+
+/* grown-ups */
+.grid{display:grid;grid-template-columns:22px repeat(12,minmax(0,1fr));gap:2px;font-size:11px;font-weight:800;text-align:center}
+.grid .h{color:var(--ink-soft);display:flex;align-items:center;justify-content:center;height:22px}
+.grid button{border:0;padding:0;cursor:pointer;height:22px;border-radius:5px;background:var(--unseen)}
+.grid button.m{background:var(--teal)} .grid button.l{background:var(--learn)} .grid button.s{background:var(--gold)} .grid button.t{background:var(--coral)}
+.grid button.pick{outline:2px solid var(--deep);outline-offset:1px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;font-weight:700}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.row2{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.row2 .good{color:var(--foam-ink)}
+.hbar{display:grid;grid-template-columns:34px 1fr 48px;align-items:center;gap:8px;font-size:14px;font-variant-numeric:tabular-nums}
+.hbar .track{height:10px;border-radius:5px;background:var(--coral-tint)}
+.hbar .track i{display:block;height:10px;border-radius:5px;background:var(--coral)}
+.weeks{display:flex;flex-direction:column;gap:6px}
+.weeks div{display:flex;align-items:center;justify-content:space-between;font-size:14px}
+.weeks .d{display:flex;gap:3px}
+.weeks .d i{width:12px;height:12px;border-radius:6px;background:var(--unseen)}
+.weeks .d i.on{background:var(--teal)}
+.text-in{font:inherit;font-weight:700;border:2px solid var(--foam);border-radius:14px;padding:10px 12px;color:var(--ink);background:var(--card);width:100%;box-sizing:border-box}
+.text-in:focus{outline:none;border-color:var(--teal)}
+.hold{position:relative;overflow:hidden}
+.hold i{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.35)}
+.hold.go i{width:100%;transition:width 1.5s linear}
+
+/* goal */
+.goal{align-items:center;text-align:center;color:#fff}
+.goal h1{font-family:var(--display);font-weight:800;font-size:38px;line-height:1.05;color:var(--pearl);margin:0}
+.goal p{margin:0;font-size:17px;line-height:1.45;max-width:300px}
+.goal .box{width:100%;box-sizing:border-box;background:#fff;color:var(--ink);border-radius:22px;padding:16px}
+.goal .box small{display:block;font-size:13px;font-weight:800;letter-spacing:1px;color:var(--teal)}
+.goal .box b{font-family:var(--display);font-size:24px}
+.goal .note{font-size:14px;color:#B9DDE3}
+
+:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app" id="app" aria-live="polite"></main>
+<script>
+(function(){
+/* ---------- constants ---------- */
+const SLOW = 8000;            /* longer than this counts as slow */
+const DAY_PRACTICE = 20;      /* practice questions that count as a day */
+const GOAL_DAYS = 4;
+const TABLES = [2,3,4,5,6,7,8,9,10,11,12];
+const FISH = [['#C9452F','#E8735E'],['#0E7480','#2FA3A8'],['#6D4BB8','#9A7BE0'],['#B98A15','#F7C948'],['#8C2F5A','#E58FB0']];
+const PRAISE = ['Fin-tastic!','Shell yes!','Splash-tastic!','You’re fin-credible!','Whale done!'];
+const KEY = 'mermaid-times-v1';
+
+/* ---------- saved data ---------- */
+function fresh(){ return {name:'', treasure:'', facts:{}, days:{}, bests:{}, goalShown:{}, practice:{tables:[2,3,4,5], tricky:true, both:false}}; }
+let D = fresh();
+try {
+  const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (s && typeof s === 'object') D = Object.assign(fresh(), s, {practice: Object.assign(fresh().practice, s.practice || {})});
+} catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(D)); } catch(e){} }
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const rint = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const range = (a,b) => { const r=[]; for(let i=a;i<=b;i++) r.push(i); return r; };
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fkey = (a,b) => a + 'x' + b;
+const secs = ms => (ms/1000).toFixed(1) + 's';
+const clock = ms => { const s = Math.floor(ms/1000); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
+function dayKey(d){ d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function monday(d){ d = new Date(d || new Date()); d.setHours(12,0,0,0); const w = (d.getDay() + 6) % 7; d.setDate(d.getDate() - w); return d; }
+function weekDays(d){ const m = monday(d); return range(0,6).map(i => { const x = new Date(m); x.setDate(m.getDate()+i); return x; }); }
+function dayRec(k){ return D.days[k] || (D.days[k] = {pq:0, races:0, q:0, right:0}); }
+function dayDone(k){ const r = D.days[k]; return !!r && (r.races >= 1 || r.pq >= DAY_PRACTICE); }
+function weekCount(d){ return weekDays(d).filter(x => dayDone(dayKey(x))).length; }
+function weekKey(d){ return dayKey(monday(d)); }
+function weeksWon(){
+  const seen = {};
+  Object.keys(D.days).forEach(k => { const [y,m,dd] = k.split('-').map(Number); const wk = weekKey(new Date(y, m-1, dd)); seen[wk] = 1; });
+  return Object.keys(seen).filter(wk => { const [y,m,dd] = wk.split('-').map(Number); return weekCount(new Date(y, m-1, dd)) >= GOAL_DAYS; }).length;
+}
+function fact(a,b){ const k = fkey(a,b); return D.facts[k] || (D.facts[k] = {seen:0, right:0, wrong:0, times:[], streak:0, tricky:false, why:'', catchDays:[], lastMiss:0, missMs:0, freedAt:0}); }
+function peek(a,b){ return D.facts[fkey(a,b)]; }
+function avg(a){ return a.length ? a.reduce((x,y) => x+y, 0) / a.length : 0; }
+function status(f){ if (!f || !f.seen) return 'u'; if (f.tricky) return f.why === 'slow' ? 's' : 't'; if (f.streak >= 3) return 'm'; return 'l'; }
+function trickyList(){
+  return Object.entries(D.facts).filter(([,f]) => f.tricky).map(([k,f]) => { const [a,b] = k.split('x').map(Number); return {a,b,f}; })
+    .sort((x,y) => y.f.lastMiss - x.f.lastMiss);
+}
+function freedThisWeek(){
+  const m = monday().getTime() - 12*3600e3;
+  return Object.entries(D.facts).filter(([,f]) => !f.tricky && f.freedAt >= m).map(([k]) => k.split('x').map(Number));
+}
+function groupsOpacity(a,b){ const f = peek(a,b), s = f ? f.streak : 0; return [1, .65, .35][s] ?? 0; }
+function fishColor(a,b){ return FISH[(a*7 + b) % FISH.length]; }
+function tip(a,b){
+  if (a === 2) return `Double ${b} is ${2*b}.`;
+  if (b === 10) return `${a} tens make ${a*10}.`;
+  return `${a-1} × ${b} = ${(a-1)*b}, and one more group of ${b} makes ${a*b}.`;
+}
+
+/* record one answer and update the tricky-fish engine */
+let EVENTS = {newTricky:[], freed:[]};
+function record(a, b, ok, ms){
+  const f = fact(a,b), today = dayKey(), fast = ms <= SLOW, k = fkey(a,b);
+  f.seen++; f.times.push(Math.round(ms)); if (f.times.length > 6) f.times.shift();
+  if (ok) f.right++; else f.wrong++;
+  const r = dayRec(today); r.q++; if (ok) r.right++;
+  if (ok && fast){
+    f.streak++;
+    if (f.tricky){
+      if (!f.catchDays.includes(today)) f.catchDays.push(today);
+      if (f.streak >= 3 && f.catchDays.length >= 2){ f.tricky = false; f.freedAt = Date.now(); f.catchDays = []; EVENTS.freed.push(k); }
+    }
+  } else {
+    if (!f.tricky) EVENTS.newTricky.push({k, why: ok ? 'slow' : 'missed', ms});
+    f.streak = 0; f.catchDays = []; f.tricky = true; f.why = ok ? 'slow' : 'missed'; f.lastMiss = Date.now(); f.missMs = Math.round(ms);
+  }
+  save();
+}
+
+/* ---------- icons ---------- */
+const fishSvg = (c, w=40, flip=false) => `<svg width="${w}" height="${w*0.7}" viewBox="0 0 40 28" aria-hidden="true" ${flip?'style="transform:scaleX(-1)"':''}><path d="M29 14L39 5v18z" fill="${c[0]}"/><ellipse cx="17" cy="14" rx="15" ry="11" fill="${c[1]}"/><circle cx="10" cy="11" r="2.5" fill="#123B57"/><path d="M6 17q3 2.5 6 0" stroke="#123B57" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;
+const I = {
+  back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  close:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  tail:'<svg width="26" height="26" viewBox="0 0 24 24" fill="#6D4BB8" aria-hidden="true"><path d="M12 2c-3 6-3 11 0 14 3-3 3-8 0-14z"/><path d="M12 15l-6 7c4-2 8-2 12 0z"/></svg>',
+  shell:'<svg width="22" height="22" viewBox="0 0 24 24" fill="#F7D6E0" aria-hidden="true"><path d="M12 3C6 3 3 9 4 15l8 6 8-6c1-6-2-12-8-12z"/><path d="M12 5v14M8 6l3 13M16 6l-3 13" stroke="#0E7480" stroke-width="1" fill="none"/></svg>',
+  chest:(s=34) => `<svg width="${s}" height="${s*0.88}" viewBox="0 0 34 30" aria-hidden="true"><rect x="3" y="12" width="28" height="15" rx="3" fill="#C98A3A"/><path d="M3 13c0-6 5-10 14-10s14 4 14 10z" fill="#E0A54F"/><rect x="14" y="11" width="6" height="7" rx="1.5" fill="#F2B630"/></svg>`,
+  clock:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E7480" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M10 2h4"/></svg>',
+  del:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8C2F5A" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h11v14H9l-6-7z"/><path d="M12 9l5 6M17 9l-5 6"/></svg>',
+  check:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+  bubble:'<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="#A8DCD8" stroke-width="2"/></svg>'
+};
+function header(title, right, backTo, closeIcon){
+  return `<div class="top"><button class="icon-btn" data-act="${closeIcon ? 'quit' : 'go'}" data-arg="${backTo || 'home'}" aria-label="${closeIcon ? 'Stop the race' : 'Back'}">${closeIcon ? I.close : I.back}</button><h1>${title}</h1>${right || '<span style="width:44px"></span>'}</div>`;
+}
+function padHtml(goLabel){
+  return `<div class="pad" role="group" aria-label="Number pad">${[1,2,3,4,5,6,7,8,9].map(n => `<button data-act="key" data-arg="${n}">${n}</button>`).join('')}
+    <button class="del" data-act="key" data-arg="del" aria-label="Delete">${I.del}</button><button data-act="key" data-arg="0">0</button><button class="go" data-act="key" data-arg="go">${goLabel}</button></div>`;
+}
+
+/* ---------- state ---------- */
+let screen = 'home';
+let P = null;   /* practice */
+let R = null;   /* race in progress */
+let RES = null; /* last race result */
+let PICK = {tab:'single', single:2, mixed:[2,3,4]};
+let GR = {cell:null, confirmReset:false};
+
+/* ---------- home ---------- */
+function homeView(){
+  const days = weekDays(), today = dayKey(), n = weekCount(), won = n >= GOAL_DAYS;
+  const tre = D.treasure ? `<b>${esc(D.treasure)}</b>` : 'a treasure you choose with Daddy';
+  const left = GOAL_DAYS - n;
+  const tricky = trickyList().length, freed = freedThisWeek().length;
+  const todayLine = dayDone(today) ? 'Today counts already. Extra swims still catch tricky fish!' : `Today: finish one race or ${DAY_PRACTICE} practice questions.`;
+  return `
+  <div class="top">
+    <div class="hello"><div class="avatar">${I.tail}</div><span>${D.name ? 'Hi, ' + esc(D.name) + '!' : 'Hi, little mermaid!'}</span></div>
+    <div class="pill">${I.chest(18)}<span>${weeksWon()} ${weeksWon() === 1 ? 'week' : 'weeks'} won</span></div>
+  </div>
+  <div class="brand"><h1>Mermaid Times</h1><p>Swim through every table, 2 to 12</p></div>
+  <div class="card raised">
+    <div class="top" style="align-items:baseline"><h2>This week’s swim</h2><span style="font-weight:800;font-size:14px;color:var(--coral)">${Math.min(n, 7)} of ${GOAL_DAYS} days</span></div>
+    <div class="week">${days.map(d => {
+      const k = dayKey(d), done = dayDone(k), isT = k === today;
+      return `<div><span class="dot ${done ? 'done' : ''} ${isT ? 'today' : ''}">${done ? I.shell : ''}</span><span class="${done || isT ? 'on' : ''}">${isT ? 'Today' : d.toLocaleDateString('en-GB', {weekday:'short'})}</span></div>`;
+    }).join('')}</div>
+    <div class="treasure ${won ? 'won' : ''}">${I.chest()}<div>${won ? 'Goal reached! Claim your treasure: ' + tre : `<b>${left} more ${left === 1 ? 'day' : 'days'}</b> unlocks this week’s treasure: ${tre}`}</div></div>
+    <p class="muted small">${todayLine}</p>
+  </div>
+  <button class="menu" data-act="practice"><span class="ico">${fishSvg(['#0E7480','#0E7480'], 34)}</span><span class="txt"><span class="name">Practice Lagoon</span><span class="desc">No clock · ${DAY_PRACTICE} questions counts as a day</span></span></button>
+  <button class="menu teal" data-act="go" data-arg="pick"><span class="ico">${I.clock}</span><span class="txt"><span class="name">Race the Tide</span><span class="desc">One table or a mix · beat your best</span></span></button>
+  <button class="menu pink" data-act="go" data-arg="tricky"><span class="ico">${fishSvg(['#C9452F','#E8735E'], 34)}</span><span class="txt"><span class="name">Tricky Fish</span><span class="desc">${tricky ? tricky + ' to catch' : 'None right now'}${freed ? ' · ' + freed + ' set free this week' : ''}</span></span></button>
+  <button class="link-btn" data-act="go" data-arg="gate">Grown-ups</button>`;
+}
+
+/* ---------- practice ---------- */
+function startPractice(mode){
+  P = {mode: mode || 'normal', count:0, input:'', answered:false, ok:false, last:null, panel:false};
+  nextPractice();
+  go('practice');
+}
+function nextPractice(){
+  let a, b, tries = 0;
+  const tl = trickyList();
+  if (P.mode === 'tricky' && !tl.length) P.mode = 'normal';
+  do {
+    if (P.mode === 'tricky' || (D.practice.tricky && tl.length && Math.random() < 0.3)){
+      const t = tl[rint(0, tl.length - 1)]; a = t.a; b = t.b;
+    } else {
+      const tabs = D.practice.tables.length ? D.practice.tables : [2];
+      a = tabs[rint(0, tabs.length - 1)]; b = rint(1, 12);
+      if (D.practice.both && b >= 2 && Math.random() < 0.5){ const x = a; a = b; b = x; }
+    }
+    tries++;
+  } while (P.last === fkey(a,b) && tries < 15);
+  P.a = a; P.b = b; P.last = fkey(a,b); P.input = ''; P.answered = false; P.start = performance.now();
+}
+function practiceView(){
+  const today = dayRec(dayKey()), done = dayDone(dayKey());
+  const pct = Math.min(100, 100 * today.pq / DAY_PRACTICE);
+  const right = `<div class="pill">${done ? 'Day done' : today.pq + ' / ' + DAY_PRACTICE}</div>`;
+  const op = groupsOpacity(P.a, P.b);
+  let fb = '';
+  if (P.answered){
+    if (P.ok && P.ms <= SLOW) fb = `<div class="fb ok"><b>${PRAISE[P.count % PRAISE.length]}</b> ${P.a} × ${P.b} = ${P.a*P.b}, in ${secs(P.ms)}.</div>`;
+    else if (P.ok) fb = `<div class="fb ok"><b>Right!</b> ${P.a} × ${P.b} = ${P.a*P.b}. That took ${secs(P.ms)}, so we’ll practise it again soon.</div>`;
+    else fb = `<div class="fb no"><b>Not quite.</b> ${P.a} × ${P.b} = ${P.a*P.b}. ${tip(P.a, P.b)}</div>`;
+  }
+  const mode = P.mode === 'tricky' ? `<div class="chips"><span class="chip on">Catching tricky fish</span><button class="chip" data-act="pmode" data-arg="normal">Back to tables</button></div>`
+    : `<div class="chips"><button class="chip" data-act="ptables">Tables: ${D.practice.tables.join(' · ') || 'none'}</button><button class="chip ${D.practice.tricky ? 'on' : ''}" data-act="ptricky">Mix in tricky fish</button><button class="chip ${D.practice.both ? 'on' : ''}" data-act="pboth">Both ways</button></div>`;
+  const panel = P.panel ? `<div class="card"><h2>Practise these tables</h2><div class="tablegrid">${TABLES.map(t => `<button class="tbtn ${D.practice.tables.includes(t) ? 'on' : ''}" data-act="ptab" data-arg="${t}" aria-pressed="${D.practice.tables.includes(t)}"><span class="n">${t}×</span></button>`).join('')}</div><button class="btn teal" data-act="ptables">Done</button></div>` : '';
+  return `
+  ${header('Practice Lagoon', right)}
+  <div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div>
+  ${mode}
+  ${panel}
+  ${P.panel ? '' : `
+  <div class="qcard">
+    <span class="deco">${fishSvg(FISH[3])}</span><span class="deco2">${I.bubble}</span>
+    <div class="q">${P.a} × ${P.b}</div>
+    <div class="groups" style="opacity:${op}">${op ? `${P.a} group${P.a === 1 ? '' : 's'} of ${P.b}` : ''}</div>
+    <div class="ans ${P.answered ? (P.ok ? 'ok' : 'no') : ''}" id="ans">${P.answered ? (P.ok ? P.input + I.check : P.input || '?') : (P.input + '<span class="caret"></span>')}</div>
+  </div>
+  ${fb}
+  ${padHtml(P.answered ? 'Next' : 'Go')}`}`;
+}
+function practiceKey(k){
+  if (P.panel) return;
+  if (P.answered){ if (k === 'go'){ nextPractice(); render(); } return; }
+  if (k === 'del'){ P.input = P.input.slice(0, -1); }
+  else if (k === 'go'){
+    if (!P.input) return;
+    P.ms = performance.now() - P.start;
+    P.ok = parseInt(P.input, 10) === P.a * P.b;
+    P.answered = true; P.count++;
+    const wasDone = dayDone(dayKey());
+    dayRec(dayKey()).pq++;
+    record(P.a, P.b, P.ok, P.ms);
+    if (!wasDone && dayDone(dayKey()) && checkGoal()){ render(); setTimeout(() => go('goal'), 1200); return; }
+  }
+  else if (P.input.length < 3){ P.input += k; }
+  render();
+}
+
+/* ---------- race picker ---------- */
+function bestFor(id){ return D.bests[id]; }
+function mixedPlan(tables){
+  let tricky = 0;
+  tables.forEach(t => { tricky += Math.min(2, range(1,12).filter(b => peek(t,b)?.tricky).length); });
+  return {total: tables.length * 6, tricky};
+}
+function pickView(){
+  const single = PICK.tab === 'single';
+  const tabs = `<div class="seg" role="group" aria-label="Race type"><button class="${single ? 'on' : ''}" data-act="ptab2" data-arg="single">One table</button><button class="${!single ? 'on' : ''}" data-act="ptab2" data-arg="mixed">Mixed tables</button></div>`;
+  if (single){
+    const b = bestFor('single:' + PICK.single);
+    return `${header('Race the Tide')}${tabs}
+    <p class="muted">Pick a table. All 12 facts come in a random order.</p>
+    <div class="tablegrid">${TABLES.map(t => { const bb = bestFor('single:' + t);
+      return `<button class="tbtn ${t === PICK.single ? 'on sel' : ''}" data-act="psingle" data-arg="${t}"><span class="n">${t}×</span><span class="b">${bb ? bb.score.toLocaleString() : 'New'}</span></button>`; }).join('')}</div>
+    <p class="muted small">The number under each table is her best score.</p>
+    <div class="card" style="margin-top:auto">
+      <h2>${PICK.single} times table</h2>
+      <p class="muted">12 questions, ${PICK.single} × 1 to ${PICK.single} × 12, shuffled</p>
+      <p class="muted">${b ? 'Best score ' + b.score.toLocaleString() + ' · ' : ''}Faster right answers score more</p>
+      <button class="btn coral" data-act="race" data-arg="single">Start the race</button>
+    </div>`;
+  }
+  const plan = mixedPlan(PICK.mixed), id = 'mix:' + PICK.mixed.slice().sort((a,b) => a-b).join(','), b = bestFor(id);
+  const trickyTags = [];
+  PICK.mixed.forEach(t => range(1,12).filter(x => peek(t,x)?.tricky).slice(0, 2).forEach(x => trickyTags.push(`${t} × ${x}`)));
+  return `${header('Race the Tide')}${tabs}
+  <p class="muted">Pick 2 or more tables to mix together.</p>
+  <div class="tablegrid">${TABLES.map(t => `<button class="tbtn ${PICK.mixed.includes(t) ? 'on' : ''}" data-act="pmix" data-arg="${t}" aria-pressed="${PICK.mixed.includes(t)}"><span class="n">${t}×</span></button>`).join('')}</div>
+  <div class="card">
+    <h2>${PICK.mixed.length ? PICK.mixed.slice().sort((a,b) => a-b).map(t => t + '×').join(' · ') + ' mixed' : 'No tables picked'}</h2>
+    <div class="stat3"><div><strong>${plan.total}</strong><span>questions</span></div><div><strong>${plan.total - plan.tricky}</strong><span>shuffled</span></div><div class="hot"><strong>${plan.tricky}</strong><span>tricky fish</span></div></div>
+    <p class="muted">Each table gets 6 questions: 4 random and 2 from her tricky fish. A table with no tricky fish gets 6 random.${b ? ' Best score for this mix: ' + b.score.toLocaleString() + '.' : ''}</p>
+    ${trickyTags.length ? `<div class="tags">${trickyTags.map(t => `<span class="tag">${t}</span>`).join('')}</div>` : ''}
+  </div>
+  <button class="btn coral" data-act="race" data-arg="mixed" style="margin-top:auto;flex:none" ${PICK.mixed.length < 2 ? 'disabled' : ''}>${PICK.mixed.length < 2 ? 'Pick at least 2 tables' : 'Start the race'}</button>`;
+}
+
+/* ---------- race ---------- */
+function buildRace(kind){
+  let qs = [];
+  if (kind === 'single'){
+    qs = shuffle(range(1,12)).map(b => ({a:PICK.single, b}));
+  } else {
+    PICK.mixed.forEach(t => {
+      const tricky = range(1,12).filter(b => peek(t,b)?.tricky).sort((x,y) => peek(t,y).lastMiss - peek(t,x).lastMiss).slice(0, 2);
+      const rest = shuffle(range(1,12).filter(b => !tricky.includes(b))).slice(0, 6 - tricky.length);
+      tricky.forEach(b => qs.push({a:t, b, tricky:true}));
+      rest.forEach(b => qs.push({a:t, b}));
+    });
+    qs = shuffle(qs);
+    for (let i = 1; i < qs.length; i++){ if (qs[i].a === qs[i-1].a && qs[i].b === qs[i-1].b){ const j = (i + 2) % qs.length; [qs[i], qs[j]] = [qs[j], qs[i]]; } }
+  }
+  return qs;
+}
+function startRace(kind){
+  const tables = kind === 'single' ? [PICK.single] : PICK.mixed.slice().sort((a,b) => a-b);
+  R = {kind, tables, id: kind === 'single' ? 'single:' + tables[0] : 'mix:' + tables.join(','), qs: buildRace(kind), i:0, score:0, right:0, input:'', answered:false, log:[], t0: performance.now()};
+  EVENTS = {newTricky:[], freed:[]};
+  R.qStart = performance.now();
+  go('race');
+  raf();
+}
+function raceView(){
+  const q = R.qs[R.i], best = bestFor(R.id), op = groupsOpacity(q.a, q.b);
+  const title = R.kind === 'single' ? R.tables[0] + ' times table' : 'Mixed · ' + R.tables.map(t => t + '×').join(' ');
+  return `
+  ${header(title, `<div class="pill" id="clock">${clock(performance.now() - R.t0)}</div>`, 'pick', true)}
+  <div style="display:flex;flex-direction:column;gap:6px">
+    <div class="prog-row"><span>Question ${R.i + 1} of ${R.qs.length}</span><span style="color:var(--teal)">Speed bonus</span></div>
+    <div class="bar"><i id="speed"></i></div>
+  </div>
+  <div class="qcard">
+    <span class="deco2">${fishSvg(fishColor(q.a, q.b), 34, true)}</span>
+    <div class="q">${q.a} × ${q.b}</div>
+    <div class="groups" style="opacity:${op}">${op ? `${q.a} groups of ${q.b}` : ''}</div>
+    <div class="ans ${R.answered ? (R.ok ? 'ok' : 'no') : ''}">${R.answered ? (R.ok ? R.input + I.check : (R.input || '–') + ' → ' + (q.a*q.b)) : R.input + '<span class="caret"></span>'}</div>
+  </div>
+  <div class="card" style="flex-direction:row;justify-content:space-between;padding:10px 16px">
+    <div><div class="small muted">Score</div><div style="font-family:var(--display);font-weight:800;font-size:22px">${R.score.toLocaleString()}</div></div>
+    <div style="text-align:right"><div class="small muted">Her best</div><div style="font-family:var(--display);font-weight:800;font-size:22px;color:var(--coral)">${best ? best.score.toLocaleString() : '–'}</div></div>
+  </div>
+  ${padHtml('Go')}`;
+}
+let rafId = 0;
+function raf(){
+  cancelAnimationFrame(rafId);
+  const step = () => {
+    if (screen !== 'race' || !R) return;
+    const now = performance.now(), c = $('clock'), s = $('speed');
+    if (c) c.textContent = clock(now - R.t0);
+    if (s){ const left = R.answered ? R.speedLeft : Math.max(0, 1 - (now - R.qStart) / SLOW); s.style.width = (left * 100) + '%'; }
+    rafId = requestAnimationFrame(step);
+  };
+  rafId = requestAnimationFrame(step);
+}
+function raceKey(k){
+  if (R.answered) return;
+  if (k === 'del'){ R.input = R.input.slice(0, -1); render(); return; }
+  if (k !== 'go'){ if (R.input.length < 3){ R.input += k; render(); } return; }
+  if (!R.input) return;
+  const q = R.qs[R.i], ms = performance.now() - R.qStart, ok = parseInt(R.input, 10) === q.a * q.b;
+  R.answered = true; R.ok = ok; R.speedLeft = Math.max(0, 1 - ms / SLOW);
+  const pts = ok ? 100 + Math.round(50 * R.speedLeft) : 0;
+  R.score += pts; if (ok) R.right++;
+  R.log.push({a:q.a, b:q.b, ok, ms, given:R.input});
+  record(q.a, q.b, ok, ms);
+  render();
+  setTimeout(() => {
+    if (screen !== 'race') return;
+    R.i++;
+    if (R.i >= R.qs.length){ finishRace(); return; }
+    R.input = ''; R.answered = false; R.qStart = performance.now();
+    render();
+  }, ok ? 650 : 1600);
+}
+function finishRace(){
+  cancelAnimationFrame(rafId);
+  const total = performance.now() - R.t0, old = bestFor(R.id);
+  const newBest = !old || R.score > old.score;
+  if (newBest) D.bests[R.id] = {score:R.score, time:Math.round(total), at:dayKey()};
+  const wasDone = dayDone(dayKey());
+  dayRec(dayKey()).races++;
+  save();
+  const goalNow = !wasDone && checkGoal();
+  RES = {kind:R.kind, tables:R.tables, id:R.id, score:R.score, right:R.right, n:R.qs.length, total, avg: avg(R.log.map(x => x.ms)), old: old ? old.score : null, newBest, goalNow,
+         newTricky: EVENTS.newTricky.slice(), freed: EVENTS.freed.slice(), week: weekCount()};
+  go('results');
+}
+function checkGoal(){
+  const wk = weekKey();
+  if (weekCount() >= GOAL_DAYS && !D.goalShown[wk]){ D.goalShown[wk] = 1; save(); return true; }
+  return false;
+}
+function resultsView(){
+  const r = RES;
+  const tricky = r.newTricky.map(t => { const [a,b] = t.k.split('x'); return `<span class="tag ${t.why === 'slow' ? 'slow' : ''}">${a} × ${b} · ${t.why === 'slow' ? 'slow ' + secs(t.ms) : 'missed'}</span>`; }).join('');
+  const freed = r.freed.map(k => k.replace('x', ' × ')).join(', ');
+  const n = r.week;
+  return `<div class="app res" style="padding:12px 0 0;flex:1">
+    ${fishSvg(FISH[1], 110)}
+    <p class="title">Tide raced!</p>
+    <div class="score">${r.score.toLocaleString()}</div>
+    ${r.newBest && r.old !== null ? `<div class="badge">New best! Old best was ${r.old.toLocaleString()}</div>` : r.newBest ? `<div class="badge">First race of this set. That’s the score to beat!</div>` : `<div class="badge soft">Best is ${bestFor(r.id).score.toLocaleString()}. So close!</div>`}
+    <div class="stat3 wide" style="text-align:center"><div style="background:var(--card)"><strong>${r.right}/${r.n}</strong><span>right</span></div><div style="background:var(--card)"><strong>${secs(r.avg)}</strong><span>per answer</span></div><div style="background:var(--card)"><strong>${clock(r.total)}</strong><span>total</span></div></div>
+    ${tricky || freed ? `<div class="card wide">${tricky ? `<h2>New tricky fish from this race</h2><div class="tags">${tricky}</div>` : ''}${freed ? `<p class="muted">Set free today: <b>${freed}</b></p>` : ''}</div>` : `<div class="card wide"><h2>No new tricky fish</h2><p class="muted">Every answer was right and under 8 seconds.</p></div>`}
+    <div class="banner ${r.goalNow || n >= GOAL_DAYS ? '' : 'soft'}">${r.goalNow ? `Today counts! That’s ${GOAL_DAYS} days this week!` : n >= GOAL_DAYS ? `This week’s goal is already done. Keep swimming!` : `Today counts! ${n} of ${GOAL_DAYS} days this week.`}</div>
+    <div class="btn-row" style="width:100%">
+      <button class="btn" data-act="race" data-arg="${r.kind}">Race again</button>
+      ${r.goalNow ? `<button class="btn coral" data-act="go" data-arg="goal" style="flex:1.4">See your treasure</button>` : `<button class="btn coral" data-act="go" data-arg="home" style="flex:1.4">Back to the lagoon</button>`}
+    </div>
+  </div>`;
+}
+
+/* ---------- tricky fish ---------- */
+function trickyView(){
+  const list = trickyList(), freed = freedThisWeek();
+  const today = dayKey();
+  return `${header('Tricky Fish')}
+  <p class="muted" style="font-size:15px">Get a fish right 3 times in a row, each under 8 seconds, on 2 different days, to set it free.</p>
+  ${list.length ? `<div style="display:flex;flex-direction:column;gap:10px">${list.slice(0, 30).map(t => {
+    const f = t.f, s = Math.min(f.streak, 3);
+    let why = f.why === 'slow' ? 'A bit slow · ' + secs(f.missMs) : (dayKey(new Date(f.lastMiss)) === today ? 'Missed today' : 'Missed on ' + new Date(f.lastMiss).toLocaleDateString('en-GB', {weekday:'long'}));
+    if (f.streak >= 3) why = 'Caught 3 in a row! Come back another day to set it free';
+    else if (f.streak > 0) why = 'Caught ' + f.streak + (f.streak === 1 ? ' time' : ' times') + ' in a row';
+    const other = peek(t.b, t.a);
+    if (t.a !== t.b && other && !other.tricky && other.streak >= 2 && f.streak === 0) why += ` · ${t.b} × ${t.a} is fine`;
+    return `<div class="fish">${fishSvg(fishColor(t.a, t.b))}<div class="txt"><span class="fact">${t.a} × ${t.b}</span><span class="why">${why}</span></div><div class="dots3" aria-label="${s} of 3 caught">${[0,1,2].map(i => `<i class="${i < s ? 'on' : ''}"></i>`).join('')}</div></div>`;
+  }).join('')}</div>` : `<div class="empty">${fishSvg(FISH[1], 80)}<b>No tricky fish!</b><p class="muted">Every fact she has tried is swimming happily. New ones appear when an answer is wrong or takes more than 8 seconds.</p></div>`}
+  ${freed.length ? `<div class="card" style="background:var(--foam)"><h2 style="color:var(--foam-ink)">Set free this week</h2><div class="tags">${freed.map(([a,b]) => `<span class="tag free">${a} × ${b}</span>`).join('')}</div></div>` : ''}
+  ${list.length ? `<button class="btn coral" data-act="practice" data-arg="tricky" style="margin-top:auto;flex:none">Catch them now</button>` : ''}`;
+}
+
+/* ---------- grown-ups ---------- */
+let holdT = null;
+function gateView(){
+  return `${header('Grown-ups')}
+  <div class="card" style="text-align:center;align-items:center;margin-top:20px">
+    ${I.chest(56)}
+    <h2>This part is for grown-ups</h2>
+    <p class="muted">Press and hold the button for 2 seconds.</p>
+    <button class="btn teal hold" id="hold" style="width:100%;flex:none"><i></i>Hold to open</button>
+  </div>`;
+}
+function weekStats(){
+  const ks = weekDays().map(d => dayKey(d));
+  let q = 0, right = 0; ks.forEach(k => { const r = D.days[k]; if (r){ q += r.q || 0; right += r.right || 0; } });
+  return {days: weekCount(), q, pct: q ? Math.round(100 * right / q) : null};
+}
+function directionTrouble(){
+  const out = [];
+  for (let a = 2; a <= 12; a++) for (let b = a + 1; b <= 12; b++){
+    const f1 = peek(a,b), f2 = peek(b,a);
+    if (!f1 || !f2 || f1.seen < 2 || f2.seen < 2) continue;
+    const acc1 = f1.right / f1.seen, acc2 = f2.right / f2.seen, t1 = avg(f1.times), t2 = avg(f2.times);
+    const gap = Math.abs(acc1 - acc2) + Math.abs(t1 - t2) / 10000;
+    if (Math.abs(acc1 - acc2) >= 0.25 || Math.abs(t1 - t2) >= 3000){
+      const weakFirst = (acc1 < acc2 || (acc1 === acc2 && t1 > t2));
+      const [wa, wb, wf, sa, sb, sf] = weakFirst ? [a,b,f1,b,a,f2] : [b,a,f2,a,b,f1];
+      out.push({gap, w:`${wa} × ${wb}`, wt: wf.wrong ? `missed ${wf.wrong} of ${wf.seen}` : secs(avg(wf.times)) + ' average', s:`${sa} × ${sb}`, st: sf.wrong ? `${sf.right} of ${sf.seen}` : secs(avg(sf.times))});
+    }
+  }
+  return out.sort((x,y) => y.gap - x.gap).slice(0, 5);
+}
+function slowTables(){
+  return TABLES.map(t => { const ts = []; range(1,12).forEach(b => { const f = peek(t,b); if (f) ts.push(...f.times); }); return {t, avg: avg(ts), n: ts.length}; })
+    .filter(x => x.n >= 3).sort((a,b) => b.avg - a.avg).slice(0, 3);
+}
+function recentWeeks(){
+  const out = [];
+  for (let i = 0; i < 6; i++){ const d = new Date(); d.setDate(d.getDate() - 7*i); const n = weekCount(d); out.push({label: monday(d).toLocaleDateString('en-GB', {day:'numeric', month:'short'}), n}); }
+  return out;
+}
+function cellInfo(a,b){
+  const f = peek(a,b);
+  if (!f || !f.seen) return `<b>${a} × ${b}</b> (${a} groups of ${b}): not tried yet.`;
+  const st = {m:'mastered', l:'learning', s:'tricky (slow)', t:'tricky (missed)'}[status(f)];
+  return `<b>${a} × ${b}</b> (${a} groups of ${b}): tried ${f.seen} ${f.seen === 1 ? 'time' : 'times'}, ${f.right} right, ${secs(avg(f.times))} average. Now ${st}.`;
+}
+function parentView(){
+  const w = weekStats(), dt = directionTrouble(), sl = slowTables(), maxAvg = sl.length ? Math.max(...sl.map(x => x.avg)) : 1;
+  return `${header('Grown-ups')}
+  <div class="stat3"><div style="background:var(--card)"><strong>${w.days} of ${GOAL_DAYS}</strong><span>days this week</span></div><div style="background:var(--card)"><strong>${w.q}</strong><span>questions</span></div><div style="background:var(--card)"><strong>${w.pct === null ? '–' : w.pct + '%'}</strong><span>right</span></div></div>
+  <div class="card">
+    <h2>Every fact, both directions</h2>
+    <p class="muted small">Row = number of groups, column = size of each group. 4 × 3 (4 groups of 3) is row 4, column 3. Tap a square for details.</p>
+    <div style="overflow-x:auto"><div class="grid" style="min-width:300px">
+      <span class="h"></span>${range(1,12).map(c => `<span class="h">${c}</span>`).join('')}
+      ${TABLES.map(a => `<span class="h">${a}</span>` + range(1,12).map(b => `<button class="${status(peek(a,b))} ${GR.cell === fkey(a,b) ? 'pick' : ''}" data-act="cell" data-arg="${fkey(a,b)}" aria-label="${a} times ${b}"></button>`).join('')).join('')}
+    </div></div>
+    <div class="legend"><span><i style="background:var(--teal)"></i>Mastered</span><span><i style="background:var(--learn)"></i>Learning</span><span><i style="background:var(--gold)"></i>Slow</span><span><i style="background:var(--coral)"></i>Tricky</span><span><i style="background:var(--unseen)"></i>Not tried</span></div>
+    ${GR.cell ? `<p class="muted">${cellInfo(...GR.cell.split('x').map(Number))}</p>` : ''}
+  </div>
+  <div class="card">
+    <h2>Direction trouble</h2>
+    ${dt.length ? dt.map(x => `<div class="row2"><span><b>${x.w}</b> ${x.wt}</span><span class="good"><b>${x.s}</b> ${x.st}</span></div>`).join('') : '<p class="muted">No differences yet. This fills in once she has tried both ways round (like 4 × 3 and 3 × 4) a few times. Turn on “Both ways” in practice to speed it up.</p>'}
+  </div>
+  <div class="card">
+    <h2>Slowest tables</h2>
+    ${sl.length ? sl.map(x => `<div class="hbar"><b>${x.t}×</b><div class="track"><i style="width:${Math.round(100 * x.avg / maxAvg)}%"></i></div><span>${secs(x.avg)}</span></div>`).join('') : '<p class="muted">Shows up after a few answers in each table.</p>'}
+  </div>
+  <div class="card">
+    <h2>Recent weeks</h2>
+    <div class="weeks">${recentWeeks().map(x => `<div><span>Week of ${x.label}</span><span class="d" aria-label="${x.n} days">${range(0,6).map(i => `<i class="${i < x.n ? 'on' : ''}"></i>`).join('')}</span><b style="min-width:58px;text-align:right">${x.n >= GOAL_DAYS ? 'Goal met' : x.n + (x.n === 1 ? ' day' : ' days')}</b></div>`).join('')}</div>
+  </div>
+  <div class="card">
+    <label for="treasure" style="font-weight:800;font-size:15px">This week’s treasure</label>
+    <input class="text-in" id="treasure" maxlength="40" placeholder="What you agreed together" value="${esc(D.treasure)}" autocomplete="off">
+    <p class="muted small">Shows on her home screen. Goal: ${GOAL_DAYS} days, Monday to Sunday. A day is one finished race or ${DAY_PRACTICE} practice questions.</p>
+    <label for="kname" style="font-weight:800;font-size:15px">Her name</label>
+    <input class="text-in" id="kname" maxlength="16" placeholder="Shown as Hi, …!" value="${esc(D.name)}" autocomplete="off">
+  </div>
+  <div class="card">
+    <h2>Start over</h2>
+    <p class="muted small">Clears every score, tricky fish and day. This cannot be undone.</p>
+    ${GR.confirmReset ? `<div class="btn-row"><button class="btn" data-act="reset" data-arg="no">Keep everything</button><button class="btn coral" data-act="reset" data-arg="yes">Yes, clear it all</button></div>` : `<button class="btn" data-act="reset" data-arg="ask" style="flex:none">Clear all progress</button>`}
+  </div>`;
+}
+
+/* ---------- goal ---------- */
+function goalView(){
+  return `<div class="app goal" style="padding:24px 0 0;flex:1">
+    <svg width="220" height="190" viewBox="0 0 220 190" aria-hidden="true">
+      <circle cx="40" cy="30" r="6" fill="none" stroke="#5FC4C8" stroke-width="2"/><circle cx="186" cy="54" r="9" fill="none" stroke="#5FC4C8" stroke-width="2"/><circle cx="170" cy="20" r="4" fill="none" stroke="#5FC4C8" stroke-width="2"/>
+      <rect x="50" y="110" width="120" height="66" rx="10" fill="#C98A3A"/>
+      <path d="M50 112c0-30 25-50 60-50s60 20 60 50z" fill="#E0A54F" transform="rotate(-18 50 112)"/>
+      <circle cx="92" cy="104" r="12" fill="#F7F1FF"/><circle cx="118" cy="96" r="9" fill="#F7D6E0"/><circle cx="136" cy="108" r="10" fill="#FFFFFF"/>
+      <rect x="98" y="132" width="24" height="22" rx="4" fill="#F2B630"/>
+      <path d="M14 142L30 132 26 152z" fill="#E8735E"/><ellipse cx="44" cy="142" rx="16" ry="11" fill="#E8735E"/><circle cx="38" cy="139" r="2.5" fill="#123B57"/>
+      <path d="M206 152L190 142 194 162z" fill="#9A7BE0"/><ellipse cx="176" cy="152" rx="16" ry="11" fill="#9A7BE0"/><circle cx="182" cy="149" r="2.5" fill="#123B57"/>
+    </svg>
+    <h1>${GOAL_DAYS} days this week!</h1>
+    <p>You swam ${GOAL_DAYS} days. Go and find Daddy to claim your treasure.</p>
+    <div class="box"><small>THIS WEEK’S TREASURE</small><b>${D.treasure ? esc(D.treasure) : 'Choose it together'}</b></div>
+    <p class="note">A new week starts on Monday. Extra swims still help your tricky fish.</p>
+    <div class="btn-row" style="width:100%"><button class="btn gold" data-act="go" data-arg="home">Back to the lagoon</button></div>
+  </div>`;
+}
+
+/* ---------- render ---------- */
+const VIEWS = {home:homeView, practice:practiceView, pick:pickView, race:raceView, results:resultsView, tricky:trickyView, gate:gateView, parent:parentView, goal:goalView};
+function render(){
+  document.body.className = screen === 'parent' || screen === 'gate' ? 'mist' : screen === 'goal' ? 'deep' : '';
+  const app = $('app'), y = window.scrollY;
+  app.innerHTML = VIEWS[screen]();
+  if (screen === 'parent' || screen === 'tricky') window.scrollTo(0, y);
+}
+function go(s){
+  if (s !== 'race') cancelAnimationFrame(rafId);
+  if (s !== 'parent'){ GR.cell = null; GR.confirmReset = false; }
+  const changed = s !== screen;
+  screen = s;
+  render();
+  if (changed) window.scrollTo(0, 0);
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t) return;
+  const act = t.dataset.act, arg = t.dataset.arg;
+  switch (act){
+    case 'go': go(arg); break;
+    case 'quit': cancelAnimationFrame(rafId); R = null; go('pick'); break;
+    case 'practice': startPractice(arg); break;
+    case 'key': screen === 'practice' ? practiceKey(arg) : screen === 'race' && raceKey(arg); break;
+    case 'ptables': P.panel = !P.panel; if (!P.panel && !D.practice.tables.length) D.practice.tables = [2]; save(); if (!P.panel) nextPractice(); render(); break;
+    case 'ptab': { const n = +arg, a = D.practice.tables; D.practice.tables = a.includes(n) ? a.filter(x => x !== n) : a.concat(n).sort((x,y) => x-y); save(); render(); break; }
+    case 'ptricky': D.practice.tricky = !D.practice.tricky; save(); render(); break;
+    case 'pboth': D.practice.both = !D.practice.both; save(); render(); break;
+    case 'pmode': P.mode = arg; nextPractice(); render(); break;
+    case 'ptab2': PICK.tab = arg; render(); break;
+    case 'psingle': PICK.single = +arg; render(); break;
+    case 'pmix': { const n = +arg; PICK.mixed = PICK.mixed.includes(n) ? PICK.mixed.filter(x => x !== n) : PICK.mixed.concat(n); render(); break; }
+    case 'race': startRace(arg); break;
+    case 'cell': GR.cell = GR.cell === arg ? null : arg; render(); break;
+    case 'reset':
+      if (arg === 'ask') GR.confirmReset = true;
+      else if (arg === 'no') GR.confirmReset = false;
+      else { D = fresh(); save(); GR.confirmReset = false; }
+      render(); break;
+  }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'treasure'){ D.treasure = e.target.value.slice(0, 40); save(); }
+  if (e.target.id === 'kname'){ D.name = e.target.value.slice(0, 16); save(); }
+});
+document.addEventListener('pointerdown', e => {
+  const h = e.target.closest('#hold'); if (!h) return;
+  h.classList.add('go');
+  holdT = setTimeout(() => go('parent'), 1500);
+});
+['pointerup','pointerleave','pointercancel'].forEach(ev => document.addEventListener(ev, e => {
+  if (!holdT) return;
+  const h = $('hold'); if (h) h.classList.remove('go');
+  clearTimeout(holdT); holdT = null;
+}));
+document.addEventListener('keydown', e => {
+  if (screen !== 'practice' && screen !== 'race') return;
+  if (e.target.tagName === 'INPUT') return;
+  let k = null;
+  if (/^[0-9]$/.test(e.key)) k = e.key; else if (e.key === 'Backspace') k = 'del'; else if (e.key === 'Enter') k = 'go';
+  if (!k) return;
+  e.preventDefault();
+  screen === 'practice' ? practiceKey(k) : raceKey(k);
+});
+
+render();
+})();
+</script>
+</body>
+</html>
