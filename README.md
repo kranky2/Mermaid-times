@@ -20,3 +20,4 @@ Untimed column addition and subtraction, laid out like a worksheet.
 - A page of 10 sums. She fills in the answer one column at a time from the ones, can tap dotted circles to write a carried 1, and can tap a top digit to borrow from it.
 - Wrong answers show which column to look at; after one try, "Show me how" explains each column.
 - The home screen shows how often each kind of sum is right first time.
+- **Three-number sums** (separate section): three numbers stacked in one column sum, like 22 + 33 + 3, 55 − 17 − 18 or 45 + 20 − 18. Add / Minus / Mix, tens or hundreds. Carry marks and borrowing go up to 2, since three numbers can need it. "Show me how" works down each column.

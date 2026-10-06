@@ -129,10 +129,11 @@ const COL = ['ones','tens','hundreds'];
 const PRAISE = ['Shell-ebrate!','Crab-tastic!','Fin-tastic!','Whale done!','Splash-tastic!'];
 
 /* ---------- data ---------- */
-function fresh(){ return {set:{op:'add', size:'tens', rg:'mix'}, page:null, stats:{}, days:{}}; }
+function fresh(){ return {set:{op:'add', size:'tens', rg:'mix'}, set3:{op:'add', size:'tens'}, page:null, page3:null, stats:{}, days:{}}; }
 let D = fresh();
-try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && typeof s === 'object') D = Object.assign(fresh(), s, {set:Object.assign(fresh().set, s.set || {})}); } catch(e){}
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && typeof s === 'object') D = Object.assign(fresh(), s, {set:Object.assign(fresh().set, s.set || {}), set3:Object.assign(fresh().set3, s.set3 || {})}); } catch(e){}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(D)); } catch(e){} }
+let CUR = 'page'; const PG = () => D[CUR];
 
 const $ = id => document.getElementById(id);
 const rint = (a,b) => a + Math.floor(Math.random()*(b-a+1));
@@ -169,7 +170,28 @@ function makeProblem(op, size, want, avoid){
   }
   return {a:12, b:3, op, size, rg:false};
 }
+function makeThree(op, size, avoid){
+  const max = size === 'tens' ? 99 : 999;
+  for (let t = 0; t < 5000; t++){
+    let a, b, c;
+    if (size === 'tens'){ a = rint(10, 99); b = Math.random() < 0.3 ? rint(1, 9) : rint(10, 99); c = Math.random() < 0.35 ? rint(1, 9) : rint(10, 99); }
+    else { a = rint(100, 999); b = Math.random() < 0.45 ? rint(100, 999) : rint(10, 99); c = Math.random() < 0.35 ? rint(100, 999) : Math.random() < 0.75 ? rint(10, 99) : rint(1, 9); }
+    const ops = op === 'add' ? ['+','+'] : op === 'sub' ? ['−','−'] : (Math.random() < 0.5 ? ['+','−'] : ['−','+']);
+    const s1 = ops[0] === '+' ? a + b : a - b; if (s1 <= 0 || s1 > max) continue;
+    const s2 = ops[1] === '+' ? s1 + c : s1 - c; if (s2 <= 0 || s2 > max) continue;
+    const k = [a, ops[0], b, ops[1], c].join(''); if (avoid.has(k)) continue;
+    return {three:true, nums:[a, b, c], ops, size, s1, s2, k};
+  }
+  return {three:true, nums:[22, 33, 3], ops:['+','+'], size, s1:55, s2:58, k:'x'};
+}
+function kind3(p){ return p.ops[0] === '+' && p.ops[1] === '+' ? 'add' : p.ops[0] === '−' && p.ops[1] === '−' ? 'sub' : 'mix'; }
 function newPage(){
+  if (CUR === 'page3'){
+    const {op, size} = D.set3, seen = new Set(), probs = [];
+    for (let i = 0; i < PAGE; i++){ const p = makeThree(op, size, seen); seen.add(p.k); probs.push(p); }
+    D[CUR] = {probs, work: probs.map(() => ({ans:[], tries:0, status:'todo', marks:{}, give:{}})), started: dayKey()};
+    save(); return;
+  }
   const {op, size, rg} = D.set, seen = new Set(), probs = [];
   for (let i = 0; i < PAGE; i++){
     const o = op === 'mix' ? (Math.random() < 0.5 ? 'add' : 'sub') : op;
@@ -178,18 +200,70 @@ function newPage(){
     seen.add(p.op + p.a + ',' + p.b); probs.push(p);
   }
   for (let i = probs.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [probs[i], probs[j]] = [probs[j], probs[i]]; }
-  D.page = {probs, work: probs.map(() => ({ans:[], tries:0, status:'todo', marks:{}, give:{}})), started: dayKey()};
+  D[CUR] = {probs, work: probs.map(() => ({ans:[], tries:0, status:'todo', marks:{}, give:{}})), started: dayKey()};
   save();
 }
 function info(p){
+  if (p.three){
+    const [a, b, c] = p.nums, r = p.s2, W = Math.max(len(a), len(b), len(c), len(r));
+    const pad = n => { const t = String(n); return Array(W - t.length).fill(null).concat(t.split('').map(Number)); };
+    const rows = [{sign:'', D:pad(a)}, {sign:p.ops[0], D:pad(b)}, {sign:p.ops[1], D:pad(c)}];
+    return {W, r, A:rows[0].D, rows, E:pad(r)};
+  }
   const W = len(p.a), r = p.op === 'add' ? p.a + p.b : p.a - p.b;
   const A = String(p.a).split('').map(Number);
   const bs = String(p.b); const B = Array(W - bs.length).fill(null).concat(bs.split('').map(Number));
   const rs = String(r); const E = Array(W - rs.length).fill(null).concat(rs.split('').map(Number));
-  return {W, r, A, B, E};
+  return {W, r, A, B, E, rows:[{sign:'', D:A}, {sign:p.op === 'add' ? '+' : '−', D:B}]};
+}
+function exprText(p){ return p.three ? `${p.nums[0]} ${p.ops[0]} ${p.nums[1]} ${p.ops[1]} ${p.nums[2]}` : `${p.a} ${p.op === 'add' ? '+' : '−'} ${p.b}`; }
+function statKey(p){ return p.three ? ['three', kind3(p), p.size].join('|') : [p.op, p.size, p.rg ? 'r' : 'n'].join('|'); }
+function colHint(f, name){
+  if (f.borrowed) return `<b>Look at the ${name}.</b> The top number is too small. Borrow from the column on its left.`;
+  if (f.lent) return `<b>Look at the ${name}.</b> This column lent to the one on its right, so its top number is smaller now.`;
+  if (f.carryIn) return `<b>Look at the ${name}.</b> Did you add what you carried?`;
+  if (f.carryOut) return `<b>Look at the ${name}.</b> That column makes 10 or more, so write the ones and carry the rest.`;
+  return `<b>Look at the ${name} again.</b> Work down the column one number at a time.`;
+}
+function explain3(p){
+  const {W, rows} = info(p), out = [], flags = [];
+  const s1 = rows[1].sign === '+' ? 1 : -1, s2 = rows[2].sign === '+' ? 1 : -1, allAdd = s1 > 0 && s2 > 0, allSub = s1 < 0 && s2 < 0;
+  let carry = 0;
+  for (let j = W - 1; j >= 0; j--){
+    const name = colName(W, j), Name = name[0].toUpperCase() + name.slice(1), next = j > 0 ? colName(W, j - 1) : '';
+    const a = rows[0].D[j], b = rows[1].D[j], c = rows[2].D[j], da = a ?? 0, db = b ?? 0, dc = c ?? 0;
+    let line = `${Name}: `, f = {};
+    if (allAdd){
+      const parts = []; if (carry) parts.push(`${carry} (carried)`); [a, b, c].forEach(x => { if (x !== null) parts.push(x); });
+      const sm = da + db + dc + carry;
+      if (parts.length === 1) line += carry ? `just the carried ${carry}, so write ${sm}.` : `nothing to add, so bring down the ${parts[0]}.`;
+      else line += `${parts.join(' + ')} = ${sm}. ` + (sm >= 10 ? `Write ${sm % 10} and carry ${Math.floor(sm / 10)} to the ${next}.` : `Write ${sm}.`);
+      f = {carryIn:carry > 0, carryOut:sm >= 10}; carry = Math.floor(sm / 10);
+    } else if (allSub){
+      const take = db + dc, lent = carry; let top = da - lent, k = 0;
+      if (lent) line += top >= 0 ? `the ${da} lent ${lent}, so it is now ${top}. ` : `the ${da} lent ${lent}, so it must borrow too. `;
+      if (top < take){ k = Math.ceil((take - top) / 10); top += 10 * k; line += `${top - 10 * k >= 0 ? (top - 10 * k) + ' is smaller than ' + take + ', so b' : 'B'}orrow ${k} from the ${next}. Now it is ${top}. `; }
+      const d = top - take;
+      if (b === null && c === null) line += (d === 0 && j === 0) ? 'Nothing left, so leave it empty.' : `Nothing to take away, so bring down ${d}.`;
+      else line += `Take away ${[b, c].filter(x => x !== null).join(' and ')}${b !== null && c !== null ? ` (that’s ${take})` : ''}: ${top} − ${take} = ${d}. Write ${d}.`;
+      f = {lent:lent > 0, borrowed:k > 0}; carry = k;
+    } else {
+      const terms = [String(da)]; if (b !== null) terms.push(`${s1 > 0 ? '+' : '−'} ${db}`); if (c !== null) terms.push(`${s2 > 0 ? '+' : '−'} ${dc}`);
+      const v = da + s1 * db + s2 * dc + carry; let nc = 0;
+      if (carry < 0) line += `this column lent ${-carry}. `;
+      line += `${carry > 0 ? carry + ' (carried) + ' : ''}${terms.join(' ')}${carry < 0 ? ' − ' + (-carry) : ''} = ${v}. `;
+      if (v >= 10){ nc = Math.floor(v / 10); line += `Write ${v % 10} and carry ${nc} to the ${next}.`; }
+      else if (v < 0){ const k = Math.ceil(-v / 10); nc = -k; line += `That’s below 0, so borrow ${k} from the ${next}: ${v} + ${10 * k} = ${v + 10 * k}. Write ${v + 10 * k}.`; }
+      else line += (j === 0 && v === 0) ? 'Leave it empty.' : `Write ${v}.`;
+      f = {carryIn:carry > 0, carryOut:v >= 10, lent:carry < 0, borrowed:v < 0}; carry = nc;
+    }
+    flags[j] = f; out.push(line.replace(/^(\w+): ([A-Z])(?=[a-z])/, (m, n, l) => n + ': ' + l.toLowerCase()));
+  }
+  return {steps:out, flags};
 }
 function colName(W, j){ return COL[W - 1 - j]; }
 function explain(p){
+  if (p.three) return explain3(p);
   const {W, A, B} = info(p), out = [], flags = [];
   let c = 0;
   for (let j = W - 1; j >= 0; j--){
@@ -239,30 +313,37 @@ const I = {
 };
 
 /* ---------- state ---------- */
-let screen = D.page && D.page.work.some(w => w.status === 'todo') ? 'home' : 'home';
+let screen = PG() && PG().work.some(w => w.status === 'todo') ? 'home' : 'home';
 let S = null;  /* solving: {i, active, checked, wrongCols, hint, showSteps} */
 
 /* ---------- home ---------- */
+function seg3(key, opts){
+  return `<div class="seg" role="group">${opts.map(([v, t, sym]) => `<button class="${D.set3[key] === v ? 'on' : ''}" data-act="set3" data-k="${key}" data-v="${v}" aria-pressed="${D.set3[key] === v}">${sym ? `<span class="sym">${sym}</span>` : ''}${t}</button>`).join('')}</div>`;
+}
 function seg(key, opts){
   return `<div class="seg" role="group">${opts.map(([v, t, sym]) => `<button class="${D.set[key] === v ? 'on' : ''}" data-act="set" data-k="${key}" data-v="${v}" aria-pressed="${D.set[key] === v}">${sym ? `<span class="sym">${sym}</span>` : ''}${t}</button>`).join('')}</div>`;
 }
 function sumHtml(p, opt){
-  const {W, A, B, E} = info(p), mini = opt.mini, w = opt.work;
+  const {W, rows, E} = info(p), A = rows[0].D, mini = opt.mini, w = opt.work;
+  const anyAdd = rows.some(r => r.sign === '+'), anySub = rows.some(r => r.sign === '−');
   let h = `<div class="sum ${mini ? 'mini' : 'big'}" style="--n:${W}">`;
   if (!mini){
     h += `<span class="c help"></span>`;
     for (let j = 0; j < W; j++){
-      if (p.op === 'add') h += `<span class="c help">${j < W - 1 ? `<button class="mark ${w.marks[j] ? 'on' : ''}" data-act="mark" data-arg="${j}" aria-label="Carry mark above the ${colName(W, j)}">${w.marks[j] ? '1' : ''}</button>` : ''}</span>`;
-      else { const nv = topValue(A, w, j); h += `<span class="c help">${nv !== null ? `<span class="newval">${nv}</span>` : ''}</span>`; }
+      const nv = anySub ? topValue(A, w, j) : null, m = w.marks[j] === true ? 1 : (w.marks[j] || 0);
+      if (nv !== null) h += `<span class="c help"><span class="newval">${nv}</span></span>`;
+      else if (anyAdd && j < W - 1) h += `<span class="c help"><button class="mark ${m ? 'on' : ''}" data-act="mark" data-arg="${j}" aria-label="Carry mark above the ${colName(W, j)}">${m || ''}</button></span>`;
+      else h += `<span class="c help"></span>`;
     }
   }
-  h += `<span class="c d"></span>`;
-  for (let j = 0; j < W; j++){
-    if (!mini && p.op === 'sub' && j < W - 1) h += `<span class="c d"><button class="topd ${topValue(A, w, j) !== null ? 'changed' : ''}" data-act="borrow" data-arg="${j}" aria-label="Borrow from the ${colName(W, j)}">${A[j]}</button></span>`;
-    else h += `<span class="c d ${!mini && p.op === 'sub' && topValue(A, w, j) !== null ? 'topd changed' : ''}">${A[j]}</span>`;
-  }
-  h += `<span class="c d sign">${p.op === 'add' ? '+' : '−'}</span>`;
-  for (let j = 0; j < W; j++) h += `<span class="c d">${B[j] ?? ''}</span>`;
+  rows.forEach((r, ri) => {
+    h += `<span class="c d ${r.sign ? 'sign' : ''}">${r.sign}</span>`;
+    for (let j = 0; j < W; j++){
+      const v = r.D[j] ?? '', ch = ri === 0 && !mini && anySub && topValue(A, w, j) !== null;
+      if (ri === 0 && !mini && anySub && j < W - 1 && r.D[j] !== null) h += `<span class="c d"><button class="topd ${ch ? 'changed' : ''}" data-act="borrow" data-arg="${j}" aria-label="Borrow from the ${colName(W, j)}">${v}</button></span>`;
+      else h += `<span class="c d ${ch ? 'topd changed' : ''}">${v}</span>`;
+    }
+  });
   h += `<span class="rule"></span><span class="c d"></span>`;
   for (let j = 0; j < W; j++){
     if (mini){
@@ -281,15 +362,16 @@ function sumHtml(p, opt){
   return h + '</div>';
 }
 function topValue(A, w, j){
-  if (!w || !w.give) return null;
-  const W = A.length, gave = w.give[j] ? 1 : 0, got = j > 0 && w.give[j - 1] ? 1 : 0;
+  if (!w || !w.give || A[j] === null) return null;
+  const gave = Number(w.give[j] || 0), got = j > 0 ? Number(w.give[j - 1] || 0) : 0;
   if (!gave && !got) return null;
   return A[j] + 10 * got - gave;
 }
 function homeView(){
   const s = D.set, wk = weekPages(), pg = D.page, left = pg ? pg.work.filter(w => w.status === 'todo').length : 0;
+  const pg3 = D.page3, left3 = pg3 ? pg3.work.filter(w => w.status === 'todo').length : 0;
   const ex = makeProblem(s.op === 'mix' ? 'add' : s.op, s.size, s.rg === 'mix' ? 'yes' : s.rg, new Set());
-  const rows = Object.entries(D.stats).filter(([, v]) => v.n >= 3).map(([k, v]) => { const [op, size, rg] = k.split('|'); return {label:typeLabel(op, size, rg === 'r'), pct:Math.round(100 * v.first / v.n), n:v.n}; }).sort((a, b) => a.pct - b.pct);
+  const rows = Object.entries(D.stats).filter(([, v]) => v.n >= 3).map(([k, v]) => { const [op, size, rg] = k.split('|'); return {label: op === 'three' ? `Three numbers, ${size === 'add' ? 'adding' : size === 'sub' ? 'taking away' : 'mixed'} · ${rg}` : typeLabel(op, size, rg === 'r'), pct:Math.round(100 * v.first / v.n), n:v.n}; }).sort((a, b) => a.pct - b.pct);
   return `
   <div class="brand">${crab(96)}<h1>Shell Sums</h1><p>Adding and taking away, one column at a time</p></div>
   <div class="card">
@@ -304,6 +386,17 @@ function homeView(){
   ${left && left < PAGE ? `<button class="btn teal" data-act="resume" style="flex:none">Carry on with my page · ${PAGE - left} of ${PAGE} done</button>` : ''}
   <button class="btn coral" data-act="newpage" style="flex:none">${left && left < PAGE ? 'Start a new page' : 'Start a page of 10'}</button>
   <div class="card">
+    <h2>Three-number sums</h2>
+    <p class="muted">Three numbers stacked in one sum, like 22 + 33 + 3 or 55 − 17 − 18.</p>
+    <span class="label">Sums</span>
+    ${seg3('op', [['add','Add','+'],['sub','Minus','−'],['mix','Mix','±']])}
+    <span class="label">Numbers</span>
+    ${seg3('size', [['tens','Tens'],['hundreds','Hundreds']])}
+    <div class="example" aria-label="Example sum">${sumHtml(makeThree(D.set3.op, D.set3.size, new Set()), {mini:true})}</div>
+    ${left3 && left3 < PAGE ? `<button class="btn soft" data-act="resume3" style="flex:none">Carry on · ${PAGE - left3} of ${PAGE} done</button>` : ''}
+    <button class="btn teal" data-act="newpage3" style="flex:none">Start a three-number page</button>
+  </div>
+  <div class="card">
     <h2>This week</h2>
     <p class="muted">${wk.pages} ${wk.pages === 1 ? 'page' : 'pages'} finished · ${wk.sums} sums done</p>
     ${rows.length ? rows.slice(0, 4).map(r => `<div class="hbar"><span>${r.label}</span><span class="track"><i class="${r.pct < 70 ? 'low' : ''}" style="width:${r.pct}%"></i></span><b>${r.pct}%</b></div>`).join('') + '<p class="muted" style="font-size:13px">Right first time, by kind of sum.</p>' : '<p class="muted" style="font-size:13px">After a few sums, this shows which kinds she gets right first time.</p>'}
@@ -312,11 +405,11 @@ function homeView(){
 }
 
 /* ---------- page ---------- */
-function nextTodo(){ return D.page.work.findIndex(w => w.status === 'todo'); }
+function nextTodo(){ return PG().work.findIndex(w => w.status === 'todo'); }
 function pageView(){
-  const pg = D.page, n = nextTodo(), done = pg.work.filter(w => w.status !== 'todo').length;
+  const pg = PG(), n = nextTodo(), done = pg.work.filter(w => w.status !== 'todo').length;
   return `
-  <div class="top"><button class="icon-btn" data-act="go" data-arg="home" aria-label="Back">${I.back}</button><h1>My page</h1><span class="pill">${done} / ${PAGE}</span></div>
+  <div class="top"><button class="icon-btn" data-act="go" data-arg="home" aria-label="Back">${I.back}</button><h1>${CUR === 'page3' ? 'Three numbers' : 'My page'}</h1><span class="pill">${done} / ${PAGE}</span></div>
   <div class="progress" aria-hidden="true">${pg.work.map(w => `<i class="${w.status === 'right' ? 'ok' : w.status}"></i>`).join('')}</div>
   <div class="sheet">${pg.probs.map((p, i) => { const w = pg.work[i];
     return `<button class="tile ${i === n ? 'next' : ''}" data-act="open" data-arg="${i}" aria-label="Sum ${i+1}${w.status !== 'todo' ? ', done' : ''}"><span class="no">${i+1}</span>${w.status === 'right' ? `<span class="st">${I.tick}</span>` : ''}${sumHtml(p, {mini:true, work:w})}</button>`; }).join('')}</div>
@@ -325,24 +418,25 @@ function pageView(){
 
 /* ---------- solving ---------- */
 function openSum(i){
-  const w = D.page.work[i], {W} = info(D.page.probs[i]);
+  const w = PG().work[i], {W} = info(PG().probs[i]);
   let active = W - 1; while (active > 0 && w.ans[active] !== undefined && w.ans[active] !== '') active--;
   S = {i, active, checked:false, wrongCols:[], hint:'', showSteps: w.status === 'shown', solvedNow: w.status !== 'todo'};
   go('solve');
 }
 function solveView(){
-  const p = D.page.probs[S.i], w = D.page.work[S.i], {W} = info(p);
-  const lead = p.op === 'add' ? 'Start with the ones. Tap a dotted circle to write a carried 1.' : 'Start with the ones. Tap a top number to borrow from it.';
+  const p = PG().probs[S.i], w = PG().work[S.i], {W} = info(p);
+  const k3 = p.three ? kind3(p) : null;
+  const lead = p.three ? (k3 === 'add' ? 'Add all three numbers, starting with the ones. Tap a dotted circle to write what you carry.' : k3 === 'sub' ? 'Take both numbers away, starting with the ones. Tap a top number to borrow from it.' : 'Work down each column, starting with the ones. Watch the + and − signs.') : p.op === 'add' ? 'Start with the ones. Tap a dotted circle to write a carried 1.' : 'Start with the ones. Tap a top number to borrow from it.';
   let fb = '';
-  if (w.status === 'right' && S.solvedNow) fb = `<div class="fb ok"><b>${PRAISE[S.i % PRAISE.length]}</b> ${p.a} ${p.op === 'add' ? '+' : '−'} ${p.b} = ${info(p).r}.</div>`;
-  else if (w.status === 'fixed' && S.solvedNow) fb = `<div class="fb ok"><b>You fixed it!</b> ${p.a} ${p.op === 'add' ? '+' : '−'} ${p.b} = ${info(p).r}.</div>`;
+  if (w.status === 'right' && S.solvedNow) fb = `<div class="fb ok"><b>${PRAISE[S.i % PRAISE.length]}</b> ${exprText(p)} = ${info(p).r}.</div>`;
+  else if (w.status === 'fixed' && S.solvedNow) fb = `<div class="fb ok"><b>You fixed it!</b> ${exprText(p)} = ${info(p).r}.</div>`;
   else if (S.hint) fb = `<div class="fb no">${S.hint}</div>`;
   else fb = `<p class="muted" style="text-align:center">${lead}</p>`;
   const steps = S.showSteps ? `<div class="fb tip"><b>Here’s how</b><ol class="steps">${explain(p).steps.map(s => `<li>${s}</li>`).join('')}</ol></div>` : '';
   const finished = w.status !== 'todo';
   const goKey = finished ? `<button class="go coral" data-act="nextsum">${nextTodo() >= 0 ? 'Next' : 'Stars!'}</button>` : `<button class="go" data-act="check">Check</button>`;
   return `
-  <div class="top"><button class="icon-btn" data-act="go" data-arg="page" aria-label="Back to my page">${I.back}</button><h1>Sum ${S.i + 1} of ${PAGE}</h1><span class="pill">${p.op === 'add' ? 'Add' : 'Take away'}</span></div>
+  <div class="top"><button class="icon-btn" data-act="go" data-arg="page" aria-label="Back to my page">${I.back}</button><h1>Sum ${S.i + 1} of ${PAGE}</h1><span class="pill">${p.three ? '3 numbers' : p.op === 'add' ? 'Add' : 'Take away'}</span></div>
   <div class="sumcard">${sumHtml(p, {work:w})}</div>
   ${fb}
   ${steps}
@@ -351,7 +445,7 @@ function solveView(){
     <button class="del" data-act="key" data-arg="del" aria-label="Delete" ${finished ? 'disabled' : ''}>${I.del}</button><button data-act="key" data-arg="0" ${finished ? 'disabled' : ''}>0</button>${goKey}</div>`;
 }
 function typeKey(k){
-  const w = D.page.work[S.i], p = D.page.probs[S.i], {W} = info(p);
+  const w = PG().work[S.i], p = PG().probs[S.i], {W} = info(p);
   if (w.status !== 'todo') return;
   if (S.checked){ S.checked = false; }
   if (k === 'del'){
@@ -364,7 +458,7 @@ function typeKey(k){
   save(); render();
 }
 function check(){
-  const w = D.page.work[S.i], p = D.page.probs[S.i], {W, E} = info(p);
+  const w = PG().work[S.i], p = PG().probs[S.i], {W, E} = info(p);
   const filled = w.ans.some(v => v !== undefined && v !== '');
   if (!filled){ S.hint = 'Type the ones first, then the tens.'; render(); return; }
   const wrong = [];
@@ -378,35 +472,34 @@ function check(){
   if (!wrong.length){
     w.status = w.tries === 1 ? 'right' : 'fixed';
     r.sums++;
-    const k = [p.op, p.size, p.rg ? 'r' : 'n'].join('|'); const st = D.stats[k] || (D.stats[k] = {n:0, first:0});
+    const k = statKey(p); const st = D.stats[k] || (D.stats[k] = {n:0, first:0});
     st.n++; if (w.tries === 1) st.first++;
     S.checked = true; S.wrongCols = []; S.hint = ''; S.solvedNow = true;
     save(); render(); return;
   }
   S.checked = true; S.wrongCols = wrong;
   const j = Math.max(...wrong), f = explain(p).flags[j], name = colName(W, j);
-  if (p.op === 'add') S.hint = f.carryIn ? `<b>Look at the ${name}.</b> Did you add the 1 you carried?` : f.carryOut ? `<b>Look at the ${name}.</b> That column makes 10 or more, so write the ones and carry 1.` : `<b>Look at the ${name} again.</b> Add the two numbers in that column.`;
-  else S.hint = f.borrowed ? `<b>Look at the ${name}.</b> The top number is too small. Borrow 1 from the column on its left.` : f.lent ? `<b>Look at the ${name}.</b> This column lent 1, so its top number is 1 smaller now.` : `<b>Look at the ${name} again.</b> Take the bottom number away from the top.`;
+  S.hint = colHint(f, name);
   if (w.tries >= 3) S.hint += ' Tap “Show me how” if you are stuck.';
   save(); render();
 }
 function showMe(){
-  const w = D.page.work[S.i], p = D.page.probs[S.i], {E} = info(p);
+  const w = PG().work[S.i], p = PG().probs[S.i], {E} = info(p);
   w.ans = E.map(v => v === null ? '' : String(v));
   w.status = 'shown'; S.showSteps = true; S.checked = false; S.hint = ''; S.solvedNow = true;
   const today = dayKey(); const r = D.days[today] || (D.days[today] = {pages:0, sums:0}); r.sums++;
-  const k = [p.op, p.size, p.rg ? 'r' : 'n'].join('|'); const st = D.stats[k] || (D.stats[k] = {n:0, first:0}); st.n++;
+  const k = statKey(p); const st = D.stats[k] || (D.stats[k] = {n:0, first:0}); st.n++;
   save(); render();
 }
 function nextSum(){
   const n = nextTodo();
-  if (n < 0){ const r = D.days[dayKey()] || (D.days[dayKey()] = {pages:0, sums:0}); r.pages++; D.page.finished = true; save(); go('results'); }
+  if (n < 0){ const r = D.days[dayKey()] || (D.days[dayKey()] = {pages:0, sums:0}); r.pages++; PG().finished = true; save(); go('results'); }
   else openSum(n);
 }
 
 /* ---------- results ---------- */
 function resultsView(){
-  const work = D.page.work, first = work.filter(w => w.status === 'right').length, fixed = work.filter(w => w.status === 'fixed').length, shown = work.filter(w => w.status === 'shown').length;
+  const work = PG().work, first = work.filter(w => w.status === 'right').length, fixed = work.filter(w => w.status === 'fixed').length, shown = work.filter(w => w.status === 'shown').length;
   const stars = first >= 9 ? 3 : first >= 7 ? 2 : 1;
   return `<div class="app res" style="padding:16px 0 0;flex:1">
     ${crab(120)}
@@ -416,7 +509,7 @@ function resultsView(){
     <p class="muted">${shown ? 'Sums with “learned how” are great ones to try again next time.' : fixed ? 'Fixing a mistake yourself is how you learn it best.' : 'Every sum right first time!'}</p>
     <div class="btn-row" style="width:100%;margin-top:auto">
       <button class="btn" data-act="go" data-arg="home">Change sums</button>
-      <button class="btn coral" data-act="newpage" style="flex:1.4">New page</button>
+      <button class="btn coral" data-act="again" style="flex:1.4">New page</button>
     </div>
   </div>`;
 }
@@ -432,26 +525,30 @@ document.addEventListener('click', e => {
   switch (a){
     case 'go': go(arg); break;
     case 'set': D.set[t.dataset.k] = t.dataset.v; save(); render(); break;
-    case 'newpage': newPage(); go('page'); break;
-    case 'resume': go('page'); break;
+    case 'newpage': CUR = 'page'; newPage(); go('page'); break;
+    case 'resume': CUR = 'page'; go('page'); break;
+    case 'newpage3': CUR = 'page3'; newPage(); go('page'); break;
+    case 'resume3': CUR = 'page3'; go('page'); break;
+    case 'again': newPage(); go('page'); break;
+    case 'set3': D.set3[t.dataset.k] = t.dataset.v; save(); render(); break;
     case 'open': openSum(+arg); break;
     case 'key': typeKey(arg); break;
     case 'check': check(); break;
     case 'showme': showMe(); break;
     case 'nextsum': nextSum(); break;
-    case 'box': { const w = D.page.work[S.i]; if (w.status === 'todo'){ S.active = +arg; S.checked = false; render(); } break; }
-    case 'mark': { const w = D.page.work[S.i]; if (w.status === 'todo'){ w.marks[arg] = !w.marks[arg]; save(); render(); } break; }
+    case 'box': { const w = PG().work[S.i]; if (w.status === 'todo'){ S.active = +arg; S.checked = false; render(); } break; }
+    case 'mark': { const w = PG().work[S.i], p = PG().probs[S.i]; if (w.status === 'todo'){ const m = w.marks[arg] === true ? 1 : (w.marks[arg] || 0); w.marks[arg] = (m + 1) % (p.three ? 3 : 2); save(); render(); } break; }
     case 'borrow': {
-      const w = D.page.work[S.i], p = D.page.probs[S.i], {A} = info(p), j = +arg; if (w.status !== 'todo') break;
-      if (w.give[j]){ w.give[j] = false; }
-      else { const got = j > 0 && w.give[j - 1] ? 10 : 0; if (A[j] + got - 1 < 0) break; w.give[j] = true; }
-      save(); render(); break;
+      const w = PG().work[S.i], p = PG().probs[S.i], A = info(p).A, j = +arg; if (w.status !== 'todo' || A[j] === null) break;
+      const maxG = p.three ? 2 : 1, cur = Number(w.give[j] || 0), got = j > 0 ? 10 * Number(w.give[j - 1] || 0) : 0;
+      let nx = cur + 1; if (nx > maxG || A[j] + got - nx < 0) nx = 0;
+      w.give[j] = nx; save(); render(); break;
     }
   }
 });
 document.addEventListener('keydown', e => {
   if (screen !== 'solve') return;
-  const w = D.page.work[S.i];
+  const w = PG().work[S.i];
   if (/^[0-9]$/.test(e.key)) { e.preventDefault(); typeKey(e.key); }
   else if (e.key === 'Backspace'){ e.preventDefault(); typeKey('del'); }
   else if (e.key === 'Enter'){ e.preventDefault(); w.status === 'todo' ? check() : nextSum(); }
