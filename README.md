@@ -11,3 +11,12 @@ A sea-themed times tables game (2× to 12×) for phones, with a weekly goal.
 The "4 groups of 3" line fades out for each fact as she gets it right in a row.
 
 Progress is saved in the phone's browser. Single `index.html`, no build step.
+
+## Shell Sums (`sums.html`)
+
+Untimed column addition and subtraction, laid out like a worksheet.
+
+- Toggles: Add / Minus / Mix · Tens / Hundreds · carrying or borrowing: No / Some / Every sum.
+- A page of 10 sums. She fills in the answer one column at a time from the ones, can tap dotted circles to write a carried 1, and can tap a top digit to borrow from it.
+- Wrong answers show which column to look at; after one try, "Show me how" explains each column.
+- The home screen shows how often each kind of sum is right first time.

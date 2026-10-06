@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Shell Sums">
+<meta name="theme-color" content="#E7F6F7">
+<title>Shell Sums</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: one phone-width column; sums sit on a white "worksheet" card with faint ruled lines, set in the lagoon look of Mermaid Times. Single light look on purpose. */
+:root{
+  color-scheme: light;
+  --lagoon:#E7F6F7; --card:#FFFFFF; --paper-line:#E3EEF2;
+  --ink:#123B57; --ink-soft:#3F6178;
+  --teal:#0E7480; --teal-deep:#0A5660; --foam:#C6EEE8; --foam-ink:#0A5660;
+  --coral:#C9452F; --coral-deep:#8E2E1F; --coral-tint:#FDE3DC;
+  --sand:#FFF1D6; --sand-ink:#7A5A12; --gold:#F2B630;
+  --pearl:#F7D6E0; --pearl-ink:#8C2F5A; --lilac:#6D4BB8;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%}
+body{margin:0;background:var(--lagoon);color:var(--ink);font-family:var(--body);font-size:16px;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+.app{max-width:440px;margin:0 auto;min-height:100%;box-sizing:border-box;padding-inline:16px;padding-block:18px 22px;display:flex;flex-direction:column;gap:14px}
+.app>*{min-width:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top h1{flex:1;margin:0;text-align:center;font-family:var(--display);font-weight:700;font-size:22px;line-height:1.1}
+.icon-btn{border:0;cursor:pointer;width:44px;height:44px;flex-shrink:0;border-radius:22px;background:var(--card);display:flex;align-items:center;justify-content:center}
+.pill{background:var(--card);border-radius:18px;padding:8px 12px;font-weight:800;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.card{background:var(--card);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:16px;font-weight:800}
+.muted{color:var(--ink-soft);font-size:14px;margin:0;line-height:1.4}
+.brand{text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.brand h1{margin:0;font-family:var(--display);font-weight:800;font-size:44px;line-height:1;color:var(--coral)}
+.brand p{margin:0;color:var(--ink-soft);font-size:15px}
+.label{font-weight:800;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-soft)}
+.seg{display:flex;background:var(--lagoon);border-radius:20px;padding:4px;gap:2px}
+.seg button{border:0;cursor:pointer;flex:1;min-height:44px;border-radius:16px;background:transparent;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:6px}
+.seg button.on{background:var(--ink);color:#fff}
+.seg .sym{font-family:var(--display);font-size:22px;line-height:1}
+.btn{border:0;cursor:pointer;min-height:54px;border-radius:20px;background:var(--card);font-weight:800;font-size:16px;color:var(--teal-deep);display:flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:0 12px}
+.btn.coral{background:var(--coral);color:#fff;box-shadow:0 5px 0 var(--coral-deep)}
+.btn.teal{background:var(--teal);color:#fff;box-shadow:0 5px 0 var(--teal-deep)}
+.btn.soft{background:var(--foam);color:var(--foam-ink)}
+.btn-row{display:flex;gap:12px}
+.link-btn{color:var(--teal);font-weight:800;font-size:14px;padding:10px 16px;align-self:center;text-decoration:none;min-height:24px}
+.example{display:flex;justify-content:center;padding:6px 0}
+
+/* the vertical sum */
+.sum{display:grid;justify-content:center;font-family:var(--display);font-weight:700;font-variant-numeric:tabular-nums}
+.sum .c{display:flex;align-items:center;justify-content:center}
+.sum .rule{grid-column:1 / -1;border-top:4px solid var(--ink);border-radius:2px}
+.big{--w:58px;grid-template-columns:44px repeat(var(--n), var(--w));row-gap:2px}
+.big .d{height:62px;font-size:52px;line-height:1}
+.big .sign{font-size:46px}
+.big .help{height:34px}
+.big .rule{margin:4px 0 8px}
+.mark{border:2px dashed #B9CAD3;background:transparent;width:28px;height:28px;border-radius:14px;cursor:pointer;font-family:var(--display);font-weight:800;font-size:18px;color:var(--coral);display:flex;align-items:center;justify-content:center;padding:0}
+.mark.on{border:2px solid var(--coral);background:var(--coral-tint)}
+.newval{font-size:24px;color:var(--coral);font-weight:800}
+.topd{border:0;background:transparent;cursor:pointer;padding:0;width:100%;height:100%;font:inherit;color:inherit;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.topd:hover{background:var(--lagoon)}
+.topd.changed{color:#9DB0BC;text-decoration:line-through;text-decoration-color:var(--coral);text-decoration-thickness:4px}
+.box{border:3px solid #B9CAD3;background:var(--card);cursor:pointer;width:50px;height:60px;border-radius:14px;font-family:var(--display);font-weight:800;font-size:44px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.box.active{border-color:var(--teal);box-shadow:0 0 0 4px var(--foam)}
+.box.ok{border-color:var(--teal);background:var(--teal);color:#fff}
+.box.bad{border-color:var(--coral);background:var(--coral-tint);color:var(--coral-deep)}
+.box.shown{border-color:var(--gold);background:var(--sand);color:var(--sand-ink)}
+.sumcard{background:var(--card);border-radius:28px;padding:16px 10px 18px;box-shadow:0 6px 0 var(--foam);background-image:repeating-linear-gradient(var(--card) 0 31px, var(--paper-line) 31px 32px)}
+
+/* worksheet page */
+.sheet{background:var(--card);border-radius:24px;padding:14px 10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;background-image:repeating-linear-gradient(var(--card) 0 31px, var(--paper-line) 31px 32px)}
+.tile{border:2px solid transparent;background:transparent;cursor:pointer;border-radius:18px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative}
+.tile:hover{border-color:var(--foam)}
+.tile.next{border-color:var(--teal);background:rgba(198,238,232,.35)}
+.tile .no{position:absolute;left:8px;top:6px;font-size:12px;font-weight:800;color:var(--ink-soft)}
+.tile .st{position:absolute;right:8px;top:6px}
+.mini{--w:22px;grid-template-columns:18px repeat(var(--n), var(--w))}
+.mini .d{height:26px;font-size:22px}
+.mini .sign{font-size:20px}
+.mini .rule{border-top-width:2.5px;margin:1px 0 2px}
+.mini .ans{color:var(--teal)}
+.mini .ans.fixed{color:var(--sand-ink)}
+.mini .ans.shown{color:var(--coral)}
+.progress{display:flex;gap:4px}
+.progress i{flex:1;height:8px;border-radius:4px;background:var(--foam)}
+.progress i.ok{background:var(--teal)} .progress i.fixed{background:var(--gold)} .progress i.shown{background:var(--coral)}
+
+.fb{border-radius:18px;padding:12px 14px;font-size:15px;line-height:1.45}
+.fb.ok{background:#D7F0EC;color:var(--foam-ink)}
+.fb.no{background:var(--coral-tint);color:var(--coral-deep)}
+.fb.tip{background:var(--sand);color:var(--sand-ink)}
+.fb b{font-weight:800}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.pad{margin-top:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pad button{border:0;cursor:pointer;height:54px;border-radius:18px;background:var(--card);box-shadow:0 4px 0 var(--foam);font-family:var(--display);font-weight:700;font-size:28px;display:flex;align-items:center;justify-content:center}
+.pad button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--foam)}
+.pad .del{background:var(--pearl);box-shadow:0 4px 0 #EDB9C8}
+.pad .go{background:var(--teal);color:#fff;box-shadow:0 4px 0 var(--teal-deep);font-family:var(--body);font-weight:800;font-size:17px}
+.pad .go.coral{background:var(--coral);box-shadow:0 4px 0 var(--coral-deep)}
+
+.res{align-items:center;text-align:center}
+.res h1{font-family:var(--display);font-weight:800;font-size:36px;line-height:1;color:var(--coral);margin:0}
+.stars{display:flex;gap:6px;align-items:flex-end}
+.stat3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%}
+.stat3 div{background:var(--card);border-radius:16px;padding:10px 0}
+.stat3 strong{display:block;font-family:var(--display);font-weight:800;font-size:24px;line-height:1.2}
+.stat3 span{font-size:12px;color:var(--ink-soft)}
+.hbar{display:grid;grid-template-columns:1fr 90px 40px;align-items:center;gap:8px;font-size:14px;font-variant-numeric:tabular-nums}
+.hbar .track{height:10px;border-radius:5px;background:var(--lagoon)}
+.hbar .track i{display:block;height:10px;border-radius:5px;background:var(--teal)}
+.hbar .track i.low{background:var(--coral)}
+:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app" id="app" aria-live="polite"></main>
+<script>
+(function(){
+const KEY = 'shell-sums-v1', PAGE = 10;
+const COL = ['ones','tens','hundreds'];
+const PRAISE = ['Shell-ebrate!','Crab-tastic!','Fin-tastic!','Whale done!','Splash-tastic!'];
+
+/* ---------- data ---------- */
+function fresh(){ return {set:{op:'add', size:'tens', rg:'mix'}, page:null, stats:{}, days:{}}; }
+let D = fresh();
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && typeof s === 'object') D = Object.assign(fresh(), s, {set:Object.assign(fresh().set, s.set || {})}); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(D)); } catch(e){} }
+
+const $ = id => document.getElementById(id);
+const rint = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const len = n => String(n).length;
+function dayKey(d){ d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function weekPages(){ const m = new Date(); m.setHours(12); m.setDate(m.getDate() - ((m.getDay()+6)%7)); let pages = 0, sums = 0;
+  for (let i = 0; i < 7; i++){ const x = new Date(m); x.setDate(m.getDate()+i); const r = D.days[dayKey(x)]; if (r){ pages += r.pages||0; sums += r.sums||0; } } return {pages, sums}; }
+
+/* ---------- maths ---------- */
+function needsRegroup(a, b, op){
+  let c = 0, any = false;
+  while (a > 0 || b > 0){
+    const da = a % 10, db = b % 10;
+    if (op === 'add'){ if (da + db + c >= 10){ any = true; c = 1; } else c = 0; }
+    else { if (da - c < db){ any = true; c = 1; } else c = 0; }
+    a = Math.floor(a/10); b = Math.floor(b/10);
+  }
+  return any;
+}
+function makeProblem(op, size, want, avoid){
+  for (let t = 0; t < 2000; t++){
+    let a, b;
+    if (size === 'tens'){ a = rint(10, 99); b = Math.random() < 0.25 ? rint(1, 9) : rint(10, 99); }
+    else { a = rint(100, 999); const r = Math.random(); b = r < 0.5 ? rint(100, 999) : r < 0.85 ? rint(10, 99) : rint(1, 9); }
+    if (b > a){ const x = a; a = b; b = x; }
+    if (len(a) !== (size === 'tens' ? 2 : 3)) continue;
+    if (op === 'add' && a + b > (size === 'tens' ? 99 : 999)) continue;
+    if (op === 'sub' && a === b) continue;
+    const need = needsRegroup(a, b, op);
+    if (want === 'yes' && !need) continue;
+    if (want === 'no' && need) continue;
+    if (avoid.has(op + a + ',' + b)) continue;
+    return {a, b, op, size, rg:need};
+  }
+  return {a:12, b:3, op, size, rg:false};
+}
+function newPage(){
+  const {op, size, rg} = D.set, seen = new Set(), probs = [];
+  for (let i = 0; i < PAGE; i++){
+    const o = op === 'mix' ? (Math.random() < 0.5 ? 'add' : 'sub') : op;
+    const w = rg === 'mix' ? (i % 2 ? 'yes' : 'no') : rg;
+    const p = makeProblem(o, size, w, seen);
+    seen.add(p.op + p.a + ',' + p.b); probs.push(p);
+  }
+  for (let i = probs.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [probs[i], probs[j]] = [probs[j], probs[i]]; }
+  D.page = {probs, work: probs.map(() => ({ans:[], tries:0, status:'todo', marks:{}, give:{}})), started: dayKey()};
+  save();
+}
+function info(p){
+  const W = len(p.a), r = p.op === 'add' ? p.a + p.b : p.a - p.b;
+  const A = String(p.a).split('').map(Number);
+  const bs = String(p.b); const B = Array(W - bs.length).fill(null).concat(bs.split('').map(Number));
+  const rs = String(r); const E = Array(W - rs.length).fill(null).concat(rs.split('').map(Number));
+  return {W, r, A, B, E};
+}
+function colName(W, j){ return COL[W - 1 - j]; }
+function explain(p){
+  const {W, A, B} = info(p), out = [], flags = [];
+  let c = 0;
+  for (let j = W - 1; j >= 0; j--){
+    const name = colName(W, j), Name = name[0].toUpperCase() + name.slice(1), next = j > 0 ? colName(W, j - 1) : '';
+    const db = B[j] ?? 0;
+    if (p.op === 'add'){
+      const s = A[j] + db + c, parts = [];
+      if (c) parts.push('1 (carried)'); parts.push(A[j]); if (B[j] !== null) parts.push(db);
+      let line = parts.length === 1 ? `${Name}: nothing to add, so bring down the ${A[j]}.` : `${Name}: ${parts.join(' + ')} = ${s}.`;
+      if (parts.length > 1) line += s >= 10 ? ` Write ${s % 10} and carry 1 to the ${next}.` : ` Write ${s}.`;
+      flags[j] = {carryIn: c === 1, carryOut: s >= 10};
+      out.unshift(line); c = s >= 10 ? 1 : 0;
+    } else {
+      let v = A[j] - c, line = `${Name}: `;
+      const lent = c === 1;
+      if (lent) line += v >= 0 ? `the ${A[j]} lent 1, so it is now ${v}. ` : `this 0 had to lend 1, so it borrows first. `;
+      let borrowed = false;
+      if (v < db){ v += 10; borrowed = true; line += `${v - 10 >= 0 ? (v - 10) + ' is smaller than ' + db + ', so b' : 'B'}orrow 1 from the ${next}. Now it is ${v}. `; c = 1; } else c = 0;
+      const d = v - db;
+      line += (B[j] === null && !borrowed) ? (d === 0 && j === 0 ? `Nothing left, so leave it empty.` : `Nothing to take away, so bring down ${d}.`) : `${v} − ${db} = ${d}. Write ${d}.`;
+      if (j === 0 && d === 0 && B[j] !== null) line += ' (A 0 at the front can be left empty.)';
+      flags[j] = {lent, borrowed};
+      out.unshift(line);
+    }
+  }
+  return {steps: out.reverse(), flags};
+}
+function typeLabel(op, size, rg){
+  const what = op === 'add' ? (rg ? 'Adding with carrying' : 'Adding, no carrying') : (rg ? 'Taking away with borrowing' : 'Taking away, no borrowing');
+  return what + ' · ' + (size === 'tens' ? 'tens' : 'hundreds');
+}
+
+/* ---------- icons ---------- */
+const crab = (s=90) => `<svg width="${s}" height="${s*0.7}" viewBox="0 0 100 70" aria-hidden="true">
+  <path d="M18 30c-10-4-14-14-8-20 3 6 8 8 12 6-4-6 0-12 6-12-4 6-2 14 4 18z" fill="#C9452F"/>
+  <path d="M82 30c10-4 14-14 8-20-3 6-8 8-12 6 4-6 0-12-6-12 4 6 2 14-4 18z" fill="#C9452F"/>
+  <path d="M22 50l-12 8M24 56l-10 10M78 50l12 8M76 56l10 10" stroke="#C9452F" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="50" cy="44" rx="30" ry="20" fill="#E8735E"/>
+  <line x1="40" y1="26" x2="38" y2="14" stroke="#C9452F" stroke-width="4" stroke-linecap="round"/><line x1="60" y1="26" x2="62" y2="14" stroke="#C9452F" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="38" cy="12" r="6" fill="#fff"/><circle cx="62" cy="12" r="6" fill="#fff"/><circle cx="39" cy="12" r="3" fill="#123B57"/><circle cx="61" cy="12" r="3" fill="#123B57"/>
+  <path d="M42 48q8 7 16 0" stroke="#123B57" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
+const I = {
+  back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  del:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8C2F5A" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h11v14H9l-6-7z"/><path d="M12 9l5 6M17 9l-5 6"/></svg>',
+  tick:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0E7480" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+  star:(on,s=40) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="${on ? '#F2B630' : '#E3EAEE'}" stroke="${on ? '#B98A15' : '#C9D5DC'}" stroke-width="1.3" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg>`
+};
+
+/* ---------- state ---------- */
+let screen = D.page && D.page.work.some(w => w.status === 'todo') ? 'home' : 'home';
+let S = null;  /* solving: {i, active, checked, wrongCols, hint, showSteps} */
+
+/* ---------- home ---------- */
+function seg(key, opts){
+  return `<div class="seg" role="group">${opts.map(([v, t, sym]) => `<button class="${D.set[key] === v ? 'on' : ''}" data-act="set" data-k="${key}" data-v="${v}" aria-pressed="${D.set[key] === v}">${sym ? `<span class="sym">${sym}</span>` : ''}${t}</button>`).join('')}</div>`;
+}
+function sumHtml(p, opt){
+  const {W, A, B, E} = info(p), mini = opt.mini, w = opt.work;
+  let h = `<div class="sum ${mini ? 'mini' : 'big'}" style="--n:${W}">`;
+  if (!mini){
+    h += `<span class="c help"></span>`;
+    for (let j = 0; j < W; j++){
+      if (p.op === 'add') h += `<span class="c help">${j < W - 1 ? `<button class="mark ${w.marks[j] ? 'on' : ''}" data-act="mark" data-arg="${j}" aria-label="Carry mark above the ${colName(W, j)}">${w.marks[j] ? '1' : ''}</button>` : ''}</span>`;
+      else { const nv = topValue(A, w, j); h += `<span class="c help">${nv !== null ? `<span class="newval">${nv}</span>` : ''}</span>`; }
+    }
+  }
+  h += `<span class="c d"></span>`;
+  for (let j = 0; j < W; j++){
+    if (!mini && p.op === 'sub' && j < W - 1) h += `<span class="c d"><button class="topd ${topValue(A, w, j) !== null ? 'changed' : ''}" data-act="borrow" data-arg="${j}" aria-label="Borrow from the ${colName(W, j)}">${A[j]}</button></span>`;
+    else h += `<span class="c d ${!mini && p.op === 'sub' && topValue(A, w, j) !== null ? 'topd changed' : ''}">${A[j]}</span>`;
+  }
+  h += `<span class="c d sign">${p.op === 'add' ? '+' : '−'}</span>`;
+  for (let j = 0; j < W; j++) h += `<span class="c d">${B[j] ?? ''}</span>`;
+  h += `<span class="rule"></span><span class="c d"></span>`;
+  for (let j = 0; j < W; j++){
+    if (mini){
+      const show = w && w.status !== 'todo';
+      h += `<span class="c d ans ${w && w.status === 'fixed' ? 'fixed' : ''} ${w && w.status === 'shown' ? 'shown' : ''}">${show ? (E[j] ?? '') : ''}</span>`;
+    } else {
+      const v = w.ans[j] ?? '';
+      let cls = '';
+      if (w.status === 'shown') cls = 'shown';
+      else if (w.status === 'right' || w.status === 'fixed') cls = 'ok';
+      else if (S.checked){ cls = S.wrongCols.includes(j) ? 'bad' : 'ok'; }
+      if (S.active === j && w.status === 'todo' && !S.solvedNow) cls += ' active';
+      h += `<span class="c d"><button class="box ${cls}" data-act="box" data-arg="${j}" aria-label="Answer, ${colName(W, j)}">${v}</button></span>`;
+    }
+  }
+  return h + '</div>';
+}
+function topValue(A, w, j){
+  if (!w || !w.give) return null;
+  const W = A.length, gave = w.give[j] ? 1 : 0, got = j > 0 && w.give[j - 1] ? 1 : 0;
+  if (!gave && !got) return null;
+  return A[j] + 10 * got - gave;
+}
+function homeView(){
+  const s = D.set, wk = weekPages(), pg = D.page, left = pg ? pg.work.filter(w => w.status === 'todo').length : 0;
+  const ex = makeProblem(s.op === 'mix' ? 'add' : s.op, s.size, s.rg === 'mix' ? 'yes' : s.rg, new Set());
+  const rows = Object.entries(D.stats).filter(([, v]) => v.n >= 3).map(([k, v]) => { const [op, size, rg] = k.split('|'); return {label:typeLabel(op, size, rg === 'r'), pct:Math.round(100 * v.first / v.n), n:v.n}; }).sort((a, b) => a.pct - b.pct);
+  return `
+  <div class="brand">${crab(96)}<h1>Shell Sums</h1><p>Adding and taking away, one column at a time</p></div>
+  <div class="card">
+    <span class="label">Sums</span>
+    ${seg('op', [['add','Add','+'],['sub','Minus','−'],['mix','Mix','±']])}
+    <span class="label">Numbers</span>
+    ${seg('size', [['tens','Tens'],['hundreds','Hundreds']])}
+    <span class="label">${s.op === 'sub' ? 'Borrowing' : s.op === 'add' ? 'Carrying' : 'Carrying & borrowing'}</span>
+    ${seg('rg', [['no','No'],['mix','Some'],['yes','Every sum']])}
+    <div class="example" aria-label="Example sum">${sumHtml(ex, {mini:true})}</div>
+  </div>
+  ${left && left < PAGE ? `<button class="btn teal" data-act="resume" style="flex:none">Carry on with my page · ${PAGE - left} of ${PAGE} done</button>` : ''}
+  <button class="btn coral" data-act="newpage" style="flex:none">${left && left < PAGE ? 'Start a new page' : 'Start a page of 10'}</button>
+  <div class="card">
+    <h2>This week</h2>
+    <p class="muted">${wk.pages} ${wk.pages === 1 ? 'page' : 'pages'} finished · ${wk.sums} sums done</p>
+    ${rows.length ? rows.slice(0, 4).map(r => `<div class="hbar"><span>${r.label}</span><span class="track"><i class="${r.pct < 70 ? 'low' : ''}" style="width:${r.pct}%"></i></span><b>${r.pct}%</b></div>`).join('') + '<p class="muted" style="font-size:13px">Right first time, by kind of sum.</p>' : '<p class="muted" style="font-size:13px">After a few sums, this shows which kinds she gets right first time.</p>'}
+  </div>
+  <a class="link-btn" href="./">Mermaid Times</a>`;
+}
+
+/* ---------- page ---------- */
+function nextTodo(){ return D.page.work.findIndex(w => w.status === 'todo'); }
+function pageView(){
+  const pg = D.page, n = nextTodo(), done = pg.work.filter(w => w.status !== 'todo').length;
+  return `
+  <div class="top"><button class="icon-btn" data-act="go" data-arg="home" aria-label="Back">${I.back}</button><h1>My page</h1><span class="pill">${done} / ${PAGE}</span></div>
+  <div class="progress" aria-hidden="true">${pg.work.map(w => `<i class="${w.status === 'right' ? 'ok' : w.status}"></i>`).join('')}</div>
+  <div class="sheet">${pg.probs.map((p, i) => { const w = pg.work[i];
+    return `<button class="tile ${i === n ? 'next' : ''}" data-act="open" data-arg="${i}" aria-label="Sum ${i+1}${w.status !== 'todo' ? ', done' : ''}"><span class="no">${i+1}</span>${w.status === 'right' ? `<span class="st">${I.tick}</span>` : ''}${sumHtml(p, {mini:true, work:w})}</button>`; }).join('')}</div>
+  ${n >= 0 ? `<button class="btn coral" data-act="open" data-arg="${n}" style="flex:none">${done ? 'Next sum' : 'Start sum 1'}</button>` : `<button class="btn coral" data-act="go" data-arg="results" style="flex:none">See my stars</button>`}`;
+}
+
+/* ---------- solving ---------- */
+function openSum(i){
+  const w = D.page.work[i], {W} = info(D.page.probs[i]);
+  let active = W - 1; while (active > 0 && w.ans[active] !== undefined && w.ans[active] !== '') active--;
+  S = {i, active, checked:false, wrongCols:[], hint:'', showSteps: w.status === 'shown', solvedNow: w.status !== 'todo'};
+  go('solve');
+}
+function solveView(){
+  const p = D.page.probs[S.i], w = D.page.work[S.i], {W} = info(p);
+  const lead = p.op === 'add' ? 'Start with the ones. Tap a dotted circle to write a carried 1.' : 'Start with the ones. Tap a top number to borrow from it.';
+  let fb = '';
+  if (w.status === 'right' && S.solvedNow) fb = `<div class="fb ok"><b>${PRAISE[S.i % PRAISE.length]}</b> ${p.a} ${p.op === 'add' ? '+' : '−'} ${p.b} = ${info(p).r}.</div>`;
+  else if (w.status === 'fixed' && S.solvedNow) fb = `<div class="fb ok"><b>You fixed it!</b> ${p.a} ${p.op === 'add' ? '+' : '−'} ${p.b} = ${info(p).r}.</div>`;
+  else if (S.hint) fb = `<div class="fb no">${S.hint}</div>`;
+  else fb = `<p class="muted" style="text-align:center">${lead}</p>`;
+  const steps = S.showSteps ? `<div class="fb tip"><b>Here’s how</b><ol class="steps">${explain(p).steps.map(s => `<li>${s}</li>`).join('')}</ol></div>` : '';
+  const finished = w.status !== 'todo';
+  const goKey = finished ? `<button class="go coral" data-act="nextsum">${nextTodo() >= 0 ? 'Next' : 'Stars!'}</button>` : `<button class="go" data-act="check">Check</button>`;
+  return `
+  <div class="top"><button class="icon-btn" data-act="go" data-arg="page" aria-label="Back to my page">${I.back}</button><h1>Sum ${S.i + 1} of ${PAGE}</h1><span class="pill">${p.op === 'add' ? 'Add' : 'Take away'}</span></div>
+  <div class="sumcard">${sumHtml(p, {work:w})}</div>
+  ${fb}
+  ${steps}
+  ${!finished && w.tries >= 1 && !S.showSteps ? `<button class="btn soft" data-act="showme" style="flex:none;min-height:46px">Show me how</button>` : ''}
+  <div class="pad" role="group" aria-label="Number pad">${[1,2,3,4,5,6,7,8,9].map(n => `<button data-act="key" data-arg="${n}" ${finished ? 'disabled' : ''}>${n}</button>`).join('')}
+    <button class="del" data-act="key" data-arg="del" aria-label="Delete" ${finished ? 'disabled' : ''}>${I.del}</button><button data-act="key" data-arg="0" ${finished ? 'disabled' : ''}>0</button>${goKey}</div>`;
+}
+function typeKey(k){
+  const w = D.page.work[S.i], p = D.page.probs[S.i], {W} = info(p);
+  if (w.status !== 'todo') return;
+  if (S.checked){ S.checked = false; }
+  if (k === 'del'){
+    if ((w.ans[S.active] ?? '') === '' && S.active < W - 1) S.active++;
+    w.ans[S.active] = '';
+  } else {
+    w.ans[S.active] = k;
+    if (S.active > 0) S.active--;
+  }
+  save(); render();
+}
+function check(){
+  const w = D.page.work[S.i], p = D.page.probs[S.i], {W, E} = info(p);
+  const filled = w.ans.some(v => v !== undefined && v !== '');
+  if (!filled){ S.hint = 'Type the ones first, then the tens.'; render(); return; }
+  const wrong = [];
+  for (let j = 0; j < W; j++){
+    const g = w.ans[j] ?? '';
+    if (E[j] === null){ if (!(g === '' || g === '0')) wrong.push(j); }
+    else if (g !== String(E[j])) wrong.push(j);
+  }
+  w.tries++;
+  const today = dayKey(); const r = D.days[today] || (D.days[today] = {pages:0, sums:0});
+  if (!wrong.length){
+    w.status = w.tries === 1 ? 'right' : 'fixed';
+    r.sums++;
+    const k = [p.op, p.size, p.rg ? 'r' : 'n'].join('|'); const st = D.stats[k] || (D.stats[k] = {n:0, first:0});
+    st.n++; if (w.tries === 1) st.first++;
+    S.checked = true; S.wrongCols = []; S.hint = ''; S.solvedNow = true;
+    save(); render(); return;
+  }
+  S.checked = true; S.wrongCols = wrong;
+  const j = Math.max(...wrong), f = explain(p).flags[j], name = colName(W, j);
+  if (p.op === 'add') S.hint = f.carryIn ? `<b>Look at the ${name}.</b> Did you add the 1 you carried?` : f.carryOut ? `<b>Look at the ${name}.</b> That column makes 10 or more, so write the ones and carry 1.` : `<b>Look at the ${name} again.</b> Add the two numbers in that column.`;
+  else S.hint = f.borrowed ? `<b>Look at the ${name}.</b> The top number is too small. Borrow 1 from the column on its left.` : f.lent ? `<b>Look at the ${name}.</b> This column lent 1, so its top number is 1 smaller now.` : `<b>Look at the ${name} again.</b> Take the bottom number away from the top.`;
+  if (w.tries >= 3) S.hint += ' Tap “Show me how” if you are stuck.';
+  save(); render();
+}
+function showMe(){
+  const w = D.page.work[S.i], p = D.page.probs[S.i], {E} = info(p);
+  w.ans = E.map(v => v === null ? '' : String(v));
+  w.status = 'shown'; S.showSteps = true; S.checked = false; S.hint = ''; S.solvedNow = true;
+  const today = dayKey(); const r = D.days[today] || (D.days[today] = {pages:0, sums:0}); r.sums++;
+  const k = [p.op, p.size, p.rg ? 'r' : 'n'].join('|'); const st = D.stats[k] || (D.stats[k] = {n:0, first:0}); st.n++;
+  save(); render();
+}
+function nextSum(){
+  const n = nextTodo();
+  if (n < 0){ const r = D.days[dayKey()] || (D.days[dayKey()] = {pages:0, sums:0}); r.pages++; D.page.finished = true; save(); go('results'); }
+  else openSum(n);
+}
+
+/* ---------- results ---------- */
+function resultsView(){
+  const work = D.page.work, first = work.filter(w => w.status === 'right').length, fixed = work.filter(w => w.status === 'fixed').length, shown = work.filter(w => w.status === 'shown').length;
+  const stars = first >= 9 ? 3 : first >= 7 ? 2 : 1;
+  return `<div class="app res" style="padding:16px 0 0;flex:1">
+    ${crab(120)}
+    <h1>${stars === 3 ? 'A shell-ebration!' : stars === 2 ? 'Crab-tastic page!' : 'Page finished!'}</h1>
+    <div class="stars" aria-label="${stars} of 3 stars">${I.star(stars >= 1, 50)}${I.star(stars >= 2, 64)}${I.star(stars >= 3, 50)}</div>
+    <div class="stat3"><div><strong>${first}</strong><span>right first time</span></div><div><strong>${fixed}</strong><span>fixed it herself</span></div><div><strong>${shown}</strong><span>learned how</span></div></div>
+    <p class="muted">${shown ? 'Sums with “learned how” are great ones to try again next time.' : fixed ? 'Fixing a mistake yourself is how you learn it best.' : 'Every sum right first time!'}</p>
+    <div class="btn-row" style="width:100%;margin-top:auto">
+      <button class="btn" data-act="go" data-arg="home">Change sums</button>
+      <button class="btn coral" data-act="newpage" style="flex:1.4">New page</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- render ---------- */
+const VIEWS = {home:homeView, page:pageView, solve:solveView, results:resultsView};
+function render(){ $('app').innerHTML = VIEWS[screen](); }
+function go(s){ const c = s !== screen; screen = s; render(); if (c) window.scrollTo(0, 0); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t || t.disabled) return;
+  const a = t.dataset.act, arg = t.dataset.arg;
+  switch (a){
+    case 'go': go(arg); break;
+    case 'set': D.set[t.dataset.k] = t.dataset.v; save(); render(); break;
+    case 'newpage': newPage(); go('page'); break;
+    case 'resume': go('page'); break;
+    case 'open': openSum(+arg); break;
+    case 'key': typeKey(arg); break;
+    case 'check': check(); break;
+    case 'showme': showMe(); break;
+    case 'nextsum': nextSum(); break;
+    case 'box': { const w = D.page.work[S.i]; if (w.status === 'todo'){ S.active = +arg; S.checked = false; render(); } break; }
+    case 'mark': { const w = D.page.work[S.i]; if (w.status === 'todo'){ w.marks[arg] = !w.marks[arg]; save(); render(); } break; }
+    case 'borrow': {
+      const w = D.page.work[S.i], p = D.page.probs[S.i], {A} = info(p), j = +arg; if (w.status !== 'todo') break;
+      if (w.give[j]){ w.give[j] = false; }
+      else { const got = j > 0 && w.give[j - 1] ? 10 : 0; if (A[j] + got - 1 < 0) break; w.give[j] = true; }
+      save(); render(); break;
+    }
+  }
+});
+document.addEventListener('keydown', e => {
+  if (screen !== 'solve') return;
+  const w = D.page.work[S.i];
+  if (/^[0-9]$/.test(e.key)) { e.preventDefault(); typeKey(e.key); }
+  else if (e.key === 'Backspace'){ e.preventDefault(); typeKey('del'); }
+  else if (e.key === 'Enter'){ e.preventDefault(); w.status === 'todo' ? check() : nextSum(); }
+});
+render();
+})();
+</script>
+</body>
+</html>
