@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="Mermaid Times">
 <meta name="theme-color" content="#E7F6F7">
 <title>Mermaid Times</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
 <style>
@@ -746,5 +748,6 @@ document.addEventListener('keydown', e => {
 render();
 })();
 </script>
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});</script>
 </body>
 </html>

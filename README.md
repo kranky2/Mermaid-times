@@ -21,3 +21,7 @@ Untimed column addition and subtraction, laid out like a worksheet.
 - Wrong answers show which column to look at; after one try, "Show me how" explains each column.
 - The home screen shows how often each kind of sum is right first time.
 - **Three-number sums** (separate section): three numbers stacked in one column sum, like 22 + 33 + 3, 55 − 17 − 18 or 45 + 20 − 18. Add / Minus / Mix, tens or hundreds. Carry marks and borrowing go up to 2, since three numbers can need it. "Show me how" works down each column.
+
+## Offline
+
+Both games work offline after they have been opened once with internet (a service worker keeps a copy on the phone). Pages still update automatically whenever the phone is online.
