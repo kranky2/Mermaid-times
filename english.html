@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Seahorse Spelling">
+<meta name="theme-color" content="#E7F6F7">
+<title>Seahorse Spelling</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: one phone-width column in the Mermaid Times lagoon look; a lilac accent marks the word explorer. Single light look on purpose. */
+:root{
+  color-scheme: light;
+  --lagoon:#E7F6F7; --card:#FFFFFF;
+  --ink:#123B57; --ink-soft:#3F6178;
+  --teal:#0E7480; --teal-deep:#0A5660; --foam:#C6EEE8; --foam-ink:#0A5660;
+  --coral:#C9452F; --coral-deep:#8E2E1F; --coral-tint:#FDE3DC;
+  --sand:#FFF1D6; --sand-ink:#7A5A12; --gold:#F2B630;
+  --pearl:#F7D6E0; --pearl-ink:#8C2F5A;
+  --lilac:#6D4BB8; --lilac-tint:#EEE8FA; --lilac-deep:#4E3290;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%}
+body{margin:0;background:var(--lagoon);color:var(--ink);font-family:var(--body);font-size:16px;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit}
+.app{max-width:440px;margin:0 auto;min-height:100%;box-sizing:border-box;padding-inline:16px;padding-block:16px 20px;display:flex;flex-direction:column;gap:12px}
+.app>*{min-width:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top h1{flex:1;margin:0;text-align:center;font-family:var(--display);font-weight:700;font-size:21px;line-height:1.1}
+.icon-btn{border:0;cursor:pointer;width:44px;height:44px;flex-shrink:0;border-radius:22px;background:var(--card);display:flex;align-items:center;justify-content:center}
+.pill{background:var(--card);border-radius:18px;padding:8px 12px;font-weight:800;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.card{background:var(--card);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:16px;font-weight:800}
+.muted{color:var(--ink-soft);font-size:14px;margin:0;line-height:1.45}
+.brand{text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.brand h1{margin:0;font-family:var(--display);font-weight:800;font-size:40px;line-height:1;color:var(--lilac)}
+.brand p{margin:0;color:var(--ink-soft);font-size:15px}
+.label{font-weight:800;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-soft)}
+.weeks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.wk{border:0;cursor:pointer;border-radius:16px;background:var(--lagoon);padding:8px 4px;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.wk b{font-size:15px}
+.wk small{font-size:12px;font-weight:700;color:var(--ink-soft)}
+.wk .meter{width:70%;height:5px;border-radius:3px;background:#D4E6EA;overflow:hidden;margin-top:3px}
+.wk .meter i{display:block;height:100%;background:var(--gold)}
+.wk.on{background:var(--lilac);color:#fff}
+.wk.on small{color:#E4DCF7}
+.wk.on .meter{background:rgba(255,255,255,.35)}
+.wk .next{font-size:10px;font-weight:800;background:var(--gold);color:var(--ink);border-radius:8px;padding:0 5px}
+.seg{display:flex;background:var(--lagoon);border-radius:20px;padding:4px;gap:2px}
+.seg button{border:0;cursor:pointer;flex:1;min-height:42px;border-radius:16px;background:transparent;font-weight:800;font-size:14px}
+.seg button.on{background:var(--ink);color:#fff}
+.menu{border:0;cursor:pointer;text-align:left;width:100%;background:var(--card);border-radius:22px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 5px 0 var(--foam)}
+.menu .ico{width:50px;height:50px;border-radius:16px;background:var(--foam);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--display);font-weight:800;font-size:22px;color:var(--teal-deep)}
+.menu .txt{flex:1;display:flex;flex-direction:column;min-width:0}
+.menu .name{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.15}
+.menu .desc{font-size:14px;color:var(--ink-soft)}
+.menu.lilac{background:var(--lilac);color:#fff;box-shadow:0 5px 0 var(--lilac-deep)}
+.menu.lilac .ico{background:#fff;color:var(--lilac)}
+.menu.lilac .desc{color:#E4DCF7}
+.menu.pink{box-shadow:0 5px 0 #F3C4D0}
+.menu.pink .ico{background:var(--pearl);color:var(--pearl-ink)}
+.btn{border:0;cursor:pointer;min-height:50px;border-radius:18px;background:var(--card);font-weight:800;font-size:15px;color:var(--teal-deep);display:flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:0 12px}
+.btn.coral{background:var(--coral);color:#fff;box-shadow:0 5px 0 var(--coral-deep)}
+.btn.teal{background:var(--teal);color:#fff;box-shadow:0 5px 0 var(--teal-deep)}
+.btn.lilac{background:var(--lilac);color:#fff;box-shadow:0 5px 0 var(--lilac-deep)}
+.btn.soft{background:var(--foam);color:var(--foam-ink)}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn-row{display:flex;gap:10px}
+.link-btn{color:var(--teal);font-weight:800;font-size:14px;padding:10px 16px;align-self:center;text-decoration:none}
+.prog{display:flex;gap:3px}
+.prog i{flex:1;height:7px;border-radius:4px;background:var(--foam)}
+.prog i.ok{background:var(--teal)} .prog i.fix{background:var(--gold)} .prog i.miss{background:var(--coral)} .prog i.now{background:var(--ink)}
+
+/* spelling card */
+.listen{background:var(--card);border-radius:24px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 5px 0 var(--foam)}
+.bigsay{border:0;cursor:pointer;width:84px;height:84px;border-radius:42px;background:var(--teal);box-shadow:0 5px 0 var(--teal-deep);display:flex;align-items:center;justify-content:center}
+.small-say{border:0;cursor:pointer;background:var(--foam);color:var(--foam-ink);font-weight:800;font-size:14px;border-radius:14px;padding:8px 12px;min-height:40px}
+.answer{min-height:64px;background:var(--card);border:3px solid var(--teal);border-radius:18px;padding:10px 12px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;font-family:var(--body);font-weight:800;font-size:30px;letter-spacing:1px;line-height:1.2;word-break:break-word;text-align:center}
+.answer .sp{display:inline-block;width:14px}
+.answer .bad{color:var(--coral);text-decoration:underline;text-decoration-thickness:3px}
+.answer .miss{display:inline-block;width:14px;border-bottom:3px solid var(--coral);margin:0 1px;height:24px}
+.answer.ok{background:var(--teal);color:#fff;border-color:var(--teal)}
+.answer.shown{background:var(--sand);border-color:var(--gold);color:var(--sand-ink)}
+.caret{display:inline-block;width:3px;height:30px;background:var(--teal);animation:blink 1s steps(1) infinite;margin-left:2px}
+@keyframes blink{50%{opacity:0}}
+.fb{border-radius:18px;padding:11px 14px;font-size:15px;line-height:1.45}
+.fb.ok{background:#D7F0EC;color:var(--foam-ink)}
+.fb.no{background:var(--coral-tint);color:var(--coral-deep)}
+.fb.tip{background:var(--sand);color:var(--sand-ink)}
+.fb.def{background:var(--lilac-tint);color:var(--lilac-deep)}
+.fb b{font-weight:800}
+.kb{display:flex;flex-direction:column;gap:6px;margin-top:auto}
+.kb .r{display:flex;gap:4px;justify-content:center}
+.kb button{border:0;cursor:pointer;height:46px;flex:1;max-width:38px;border-radius:9px;background:var(--card);box-shadow:0 3px 0 var(--foam);font-weight:800;font-size:20px;padding:0}
+.kb button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--foam)}
+.kb .wide{max-width:none;font-size:14px}
+.kb .go{background:var(--teal);color:#fff;box-shadow:0 3px 0 var(--teal-deep)}
+.kb .del{background:var(--pearl);box-shadow:0 3px 0 #EDB9C8}
+
+/* read-aloud */
+.dict{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.dict .num{font-family:var(--display);font-weight:800;font-size:72px;line-height:1;color:var(--lilac)}
+.sheet-row{background:var(--card);border-radius:14px;padding:8px 10px;display:flex;align-items:center;gap:10px}
+.sheet-row .n{font-weight:800;color:var(--ink-soft);min-width:24px}
+.sheet-row .a{flex:1;text-align:left;font-weight:800;font-size:18px}
+.mk{border:0;cursor:pointer;width:44px;height:44px;border-radius:12px;background:var(--lagoon);font-weight:800;font-size:18px}
+.mk.on.ok{background:var(--teal);color:#fff}
+.mk.on.no{background:var(--coral);color:#fff}
+
+/* word explorer */
+.wlist{display:flex;flex-direction:column;gap:8px}
+.witem{border:0;cursor:pointer;text-align:left;background:var(--card);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.witem .t{flex:1;min-width:0}
+.witem .t b{display:block;font-size:17px}
+.witem .t span{font-size:13px;color:var(--ink-soft)}
+.witem .n{font-weight:800;color:var(--lilac);min-width:22px}
+.wcard{background:var(--card);border-radius:24px;padding:18px 16px;display:flex;flex-direction:column;gap:14px}
+.wcard .head{display:flex;align-items:center;gap:10px}
+.wcard .head h2{flex:1;margin:0;font-family:var(--display);font-weight:800;font-size:30px;line-height:1.1;color:var(--lilac-deep)}
+.wcard .key{font-size:14px;color:var(--ink-soft);font-weight:700}
+.sec{display:flex;flex-direction:column;gap:6px}
+.sec h3{margin:0;font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--lilac)}
+.sec p{margin:0;font-size:16px;line-height:1.5}
+.sec ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:15px;line-height:1.45}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{background:var(--lilac-tint);color:var(--lilac-deep);border-radius:12px;padding:5px 10px;font-weight:800;font-size:14px}
+.tag.fam{background:var(--foam);color:var(--foam-ink)}
+.tag.opp{background:var(--coral-tint);color:var(--coral-deep)}
+.eg{font-style:italic}
+.say-sm{border:0;cursor:pointer;width:40px;height:40px;border-radius:20px;background:var(--lilac-tint);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+.res{align-items:center;text-align:center}
+.res h1{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;color:var(--lilac);margin:0}
+.big{font-family:var(--display);font-weight:800;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.list{display:flex;flex-direction:column;gap:6px;width:100%}
+.li{background:var(--card);border-radius:14px;padding:9px 12px;display:flex;align-items:center;gap:10px;text-align:left}
+.li .w{flex:1;font-weight:800;font-size:16px}
+.li .m{font-weight:800;font-size:13px;border-radius:10px;padding:3px 8px}
+.m.ok{background:#D7F0EC;color:var(--foam-ink)} .m.fix{background:var(--sand);color:var(--sand-ink)} .m.miss{background:var(--coral-tint);color:var(--coral-deep)}
+:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app" id="app" aria-live="polite"></main>
+<script>
+(function(){
+/* CHIJ OLGC P1 English spelling list, Term 4 2026. Definitions written for a Primary 1 reader. */
+const WEEKS = [{"week": 2, "date": "2026-09-22", "book": "Lazy Duck", "items": [{"w": "lazy duck", "key": "lazy", "def": "Not wanting to work or do anything hard.", "eg": "The lazy duck stayed in bed all morning.", "uses": ["A lazy afternoon is a slow, relaxing one.", "A lazy river flows very slowly."], "fam": ["laziness", "lazily", "lazier", "laziest"], "syn": ["idle", "slow", "sluggish"], "opp": ["hardworking", "busy"]}, {"w": "waddled around", "key": "waddled", "def": "Walked with short steps, rocking from side to side, like a duck.", "eg": "The duck waddled around the pond.", "uses": ["Penguins waddle across the ice.", "A baby can waddle when learning to walk."], "fam": ["waddle", "waddles", "waddling"], "syn": ["wobbled", "toddled", "shuffled"], "tip": "Double d: wa-dd-led."}, {"w": "watched the animals", "key": "watched", "def": "Looked at something carefully for some time.", "eg": "She watched the animals eat their food.", "uses": ["A watch is a small clock you wear on your wrist.", "'Watch out!' means be careful."], "fam": ["watch", "watches", "watching", "watchful"], "syn": ["looked at", "observed", "viewed"], "tip": "Watch has a silent t: wa-t-ch."}, {"w": "prowled", "key": "prowled", "def": "Moved around quietly and slowly, looking for something to catch.", "eg": "The cat prowled around the barn at night.", "uses": ["An animal 'on the prowl' is hunting for food."], "fam": ["prowl", "prowling", "prowler"], "syn": ["crept", "sneaked", "stalked", "lurked"], "tip": "The 'ow' sound is spelt o-w, like in owl."}, {"w": "shouted", "key": "shouted", "def": "Said something very loudly.", "eg": "The farmer shouted, 'Time to work!'", "uses": ["To shout out an answer means to call it out.", "To give someone a shout means to call them."], "fam": ["shout", "shouts", "shouting"], "syn": ["yelled", "called out", "cried"], "opp": ["whispered"]}, {"w": "looking for mice", "key": "mice", "def": "More than one mouse.", "eg": "The cat was looking for mice in the hay.", "uses": ["A computer mouse helps you move the pointer on a screen.", "'As quiet as a mouse' means very quiet."], "fam": ["mouse", "mousy"], "syn": ["rodents"], "tip": "One mouse, two mice. Looking has double o."}, {"w": "scratched", "key": "scratched", "def": "Rubbed or scraped something with nails or claws.", "eg": "The hen scratched the ground for worms.", "uses": ["A scratch is a small cut on your skin.", "He scratched his head when he was puzzled.", "To start from scratch means to start from the very beginning."], "fam": ["scratch", "scratches", "scratching", "scratchy"], "syn": ["scraped", "clawed", "rubbed"], "tip": "Scratch has a silent t: scra-t-ch."}, {"w": "scraped", "key": "scraped", "def": "Rubbed something rough or sharp along a surface.", "eg": "The farmer scraped the mud off his boots.", "uses": ["A scraped knee is a knee with the skin rubbed off.", "She scraped the last bit of ice cream from the bowl."], "fam": ["scrape", "scraping", "scraper"], "syn": ["scratched", "grazed", "rubbed"], "tip": "Scrape + d = scraped (only one p)."}, {"w": "big brown eggs", "key": "eggs", "def": "Eggs are the round things laid by hens and other birds. A baby bird can grow inside, and we also cook them to eat.", "eg": "The hen laid three big brown eggs.", "uses": ["We can boil, fry or scramble eggs.", "'Big' and 'brown' describe the eggs: their size and colour."], "fam": ["egg", "eggshell", "egg yolk"], "syn": ["large (for big)", "huge (for big)"], "tip": "Eggs has double g."}, {"w": "in the farmyard", "key": "farmyard", "def": "The open space around a farm's buildings where the animals are kept.", "eg": "The pigs rolled in the mud in the farmyard.", "uses": ["A yard can also be a school yard or a backyard.", "A yard is also a measure of length, about one big step."], "fam": ["farm", "farmer", "yard", "farmhouse"], "syn": ["barnyard"], "tip": "Two words joined: farm + yard."}]}, {"week": 3, "date": "2026-09-29", "book": "Lazy Duck", "items": [{"w": "farmers' tea", "key": "farmers'", "def": "Tea belonging to the farmers. The apostrophe after the s shows it belongs to more than one farmer.", "eg": "The duck waddled over to the farmers' tea.", "uses": ["One farmer: a farmer's hat (apostrophe before the s).", "Tea can also mean an early evening meal, not just a drink."], "fam": ["farm", "farmer", "farmers", "farming"], "syn": ["growers (for farmers)"], "tip": "Apostrophe goes after the s: farmers'."}, {"w": "round and round", "key": "round", "def": "Going in circles again and again.", "eg": "The duck swam round and round the pond.", "uses": ["Round can also mean shaped like a circle: a round ball.", "A round in a game is one turn for everyone."], "fam": ["around", "rounded", "roundabout"], "syn": ["in circles", "around and around"]}, {"w": "getting the sheep", "key": "getting", "def": "Going to fetch or bring something back.", "eg": "The dog was getting the sheep into the pen.", "uses": ["Getting can mean becoming: It is getting dark.", "Getting can mean receiving: She is getting a present."], "fam": ["get", "gets", "got"], "syn": ["fetching", "bringing", "rounding up"], "tip": "Double t: ge-tt-ing. One sheep, two sheep (no s)."}, {"w": "weeds and thistles", "key": "thistles", "def": "Weeds are plants growing where you do not want them. Thistles are prickly wild plants, often with purple flowers.", "eg": "The farmers pulled out the weeds and thistles.", "uses": ["To weed the garden means to pull out the weeds.", "The thistle is the national flower of Scotland."], "fam": ["weed", "weeding", "weedy", "thistle"], "syn": ["wild plants", "prickly plants"], "tip": "Thistle has a silent t: this-t-le."}, {"w": "went to work", "key": "went", "def": "Moved or travelled to a place. Went is the past of go.", "eg": "Everyone went to work in the fields.", "uses": ["Went can mean became: The milk went sour.", "The bell went at 3 o'clock means the bell rang."], "fam": ["go", "goes", "going", "gone"], "syn": ["headed", "travelled", "set off"]}, {"w": "in the garden", "key": "garden", "def": "A piece of land where flowers, plants or vegetables are grown.", "eg": "The farmer planted carrots in the garden.", "uses": ["A garden can be a big park, like the Botanic Gardens.", "To garden means to work in a garden."], "fam": ["gardener", "gardening", "gardens"], "syn": ["yard", "plot", "patch"]}, {"w": "with their hoes", "key": "hoes", "def": "Hoes are garden tools with long handles and flat blades, used to dig out weeds.", "eg": "They chopped the weeds with their hoes.", "uses": ["To hoe the soil means to break it up with a hoe.", "Don't mix up hoes (tools) and hose (a water pipe)!"], "fam": ["hoe", "hoed", "hoeing"], "syn": ["garden tools"], "tip": "Hoe + s = hoes."}, {"w": "cleaning up", "key": "cleaning", "def": "Making a place tidy and clean.", "eg": "After the party, we were cleaning up the room.", "uses": ["Clean up your mess means tidy it away.", "You can clean yourself up: wash and look neat."], "fam": ["clean", "cleaner", "cleaned", "cleanly"], "syn": ["tidying", "washing", "sweeping"], "opp": ["making a mess"]}, {"w": "beetles and bugs", "key": "beetles", "def": "Beetles are insects with hard, shiny wing covers. Bugs are small insects and creepy-crawlies.", "eg": "The hens pecked at beetles and bugs.", "uses": ["A tummy bug is a germ that makes you ill.", "A bug in a computer game is a mistake that makes it go wrong."], "fam": ["beetle", "bug", "buggy"], "syn": ["insects", "creepy-crawlies"], "tip": "Beetle has double e, like bee."}, {"w": "busiest", "key": "busiest", "def": "Having the most things to do. The most busy.", "eg": "Saturday is the busiest day on the farm.", "uses": ["A busy road has lots of cars on it."], "fam": ["busy", "busier", "busily", "business"], "syn": ["most active", "hardest-working"], "opp": ["laziest", "quietest"], "tip": "Busy, busier, busiest: change y to i before adding -est."}]}, {"week": 4, "date": "2026-10-06", "book": "The King's Cake", "items": [{"w": "birthday cake", "key": "birthday", "def": "A special cake made to celebrate the day someone was born.", "eg": "Mum baked a birthday cake with seven candles.", "uses": ["A cake of soap is a bar of soap.", "'A piece of cake' means something very easy."], "fam": ["birth", "birthdays", "cake", "cupcake"], "syn": ["celebration cake"], "tip": "Two words joined: birth + day."}, {"w": "blow the candles", "key": "blow", "def": "Push air out of your mouth.", "eg": "Make a wish and blow the candles out!", "uses": ["The wind can blow your hat away.", "A blow can also mean a hard hit."], "fam": ["blew", "blown", "blowing"], "syn": ["puff", "breathe out"], "tip": "Candle ends in -le: can-dle."}, {"w": "huffed and puffed", "key": "huffed", "def": "Breathed loudly and heavily, from hard work or from being cross.", "eg": "The king huffed and puffed up the stairs.", "uses": ["The big bad wolf huffed and puffed and blew the house down.", "Being in a huff means being in a cross, sulky mood."], "fam": ["huff", "puff", "puffy", "huffing", "puffing"], "syn": ["panted", "gasped", "breathed hard"], "tip": "Double f in both: hu-ff-ed, pu-ff-ed."}, {"w": "waggled his head", "key": "waggled", "def": "Moved quickly from side to side or up and down.", "eg": "The puppy waggled his head and barked.", "uses": ["A happy dog wags its tail.", "You can waggle your fingers to wave."], "fam": ["waggle", "wag", "wagging", "waggling"], "syn": ["wiggled", "shook", "wobbled"], "tip": "Double g: wa-gg-led."}, {"w": "squirted", "key": "squirted", "def": "Made a liquid shoot out in a thin, fast stream.", "eg": "She squirted cream onto the cake.", "uses": ["A water pistol squirts water.", "A squirt can mean a small amount: a squirt of ketchup."], "fam": ["squirt", "squirting", "squirty"], "syn": ["sprayed", "spurted", "splashed"], "tip": "q is always followed by u: squ-irt."}, {"w": "cradled", "key": "cradled", "def": "Held something gently and carefully in your arms.", "eg": "The king cradled the cake like a baby.", "uses": ["A cradle is a small bed that rocks for a baby.", "You can cradle your chin in your hands when you think."], "fam": ["cradle", "cradles", "cradling"], "syn": ["held", "hugged", "nestled"]}, {"w": "gritted", "key": "gritted", "def": "Pressed your teeth tightly together, because you are cross or trying very hard.", "eg": "He gritted his teeth and kept going.", "uses": ["Grit is tiny bits of stone or sand.", "Grit can also mean courage and not giving up."], "fam": ["grit", "gritty", "gritting"], "syn": ["clenched"], "tip": "Double t: gri-tt-ed."}, {"w": "came running", "key": "running", "def": "Ran quickly towards someone or something.", "eg": "When he heard the bell, the dog came running.", "uses": ["Running can mean working: The engine is running.", "Running water comes out of a tap."], "fam": ["run", "ran", "runner", "come", "came"], "syn": ["rushed", "dashed", "hurried", "raced"], "tip": "Double n: ru-nn-ing."}, {"w": "furrowed", "key": "furrowed", "def": "Wrinkled your forehead because you are worried, cross or thinking hard.", "eg": "The king furrowed his brow at the burnt cake.", "uses": ["A furrow is a long line dug in the soil by a plough.", "A furrowed field has neat rows of lines."], "fam": ["furrow", "furrows", "furrowing"], "syn": ["wrinkled", "creased", "frowned"], "tip": "Double r: fu-rr-owed."}, {"w": "garden hose", "key": "hose", "def": "A long, bendy tube that carries water.", "eg": "Dad watered the plants with the garden hose.", "uses": ["Firefighters spray water on fires with big hoses.", "Don't mix up hose (a water pipe) and hoes (garden tools)!"], "fam": ["hoses", "hosepipe"], "syn": ["hosepipe", "water pipe"]}]}, {"week": 6, "date": "2026-10-20", "book": "The King's Cake", "items": [{"w": "had a birthday party", "key": "party", "def": "A party is a time when people get together to eat, play and have fun.", "eg": "I had a birthday party at the park.", "uses": ["A party can also be a group of people: a search party.", "Had can mean ate: I had rice for lunch."], "fam": ["parties", "have", "has", "had"], "syn": ["celebration", "get-together"]}, {"w": "baked a chocolate cake", "key": "baked", "def": "Cooked food in an oven.", "eg": "Grandma baked a chocolate cake for me.", "uses": ["The sun baked the ground: it made it very hot and dry.", "A baker bakes bread in a bakery."], "fam": ["bake", "baker", "bakery", "baking"], "syn": ["cooked", "made"], "tip": "Chocolate: choc-o-late."}, {"w": "blew some balloons", "key": "blew", "def": "Pushed air out of your mouth. Blew is the past of blow.", "eg": "We blew some balloons for the party.", "uses": ["The wind blew the leaves away.", "She blew her nose with a tissue."], "fam": ["blow", "blown", "blowing", "balloon"], "syn": ["puffed up", "inflated (filled with air)"], "tip": "Blew (air) sounds like blue (colour). Balloon has double l and double o."}, {"w": "decorated the room", "key": "decorated", "def": "Made something look pretty by adding things to it.", "eg": "We decorated the room with streamers.", "uses": ["Decorating can also mean painting a room.", "A hero can be decorated: given a medal."], "fam": ["decorate", "decoration", "decorations"], "syn": ["dressed up", "made pretty", "trimmed"], "tip": "dec-o-ra-ted."}, {"w": "invited friends", "key": "invited", "def": "Asked someone to come to something.", "eg": "She invited friends to her party.", "uses": ["An invitation is the card that asks you to come.", "An inviting pool looks so nice you want to jump in."], "fam": ["invite", "invitation", "inviting"], "syn": ["asked", "welcomed"], "tip": "Friend: i before e, fr-ie-nd."}, {"w": "received presents", "key": "received", "def": "Got something that was given or sent to you.", "eg": "She received presents from her friends.", "uses": ["You receive a letter in the post.", "A receipt is the paper you receive when you buy something."], "fam": ["receive", "receiver", "receipt"], "syn": ["got", "was given"], "opp": ["gave"], "tip": "e before i after c: rec-ei-ved."}, {"w": "sang songs", "key": "sang", "def": "Made music with your voice. Sang is the past of sing.", "eg": "We sang songs around the cake.", "uses": ["Birds sang in the trees in the morning."], "fam": ["sing", "sung", "singer", "song"], "syn": ["hummed", "chanted", "performed"]}, {"w": "played games", "key": "played", "def": "Had fun doing something, or took part in a game.", "eg": "The children played games like musical chairs.", "uses": ["She played the piano: made music with it.", "An actor plays a part in a show."], "fam": ["play", "player", "playful", "playground"], "syn": ["had fun", "joined in"]}, {"w": "ate delicious food", "key": "delicious", "def": "Tasting very, very good.", "eg": "We ate delicious food at the party.", "uses": ["A delicious smell makes you feel hungry."], "fam": ["deliciously", "ate", "eat", "eaten"], "syn": ["yummy", "tasty", "scrumptious"], "opp": ["yucky", "disgusting"], "tip": "de-li-cious: the 'sh' sound is spelt c-i-o-u-s."}, {"w": "felt happy", "key": "happy", "def": "Felt means had a feeling. Happy means feeling glad and pleased.", "eg": "She felt happy when everyone sang to her.", "uses": ["Felt is also a soft, thick cloth used for crafts.", "She felt the soft fur: she touched it."], "fam": ["feel", "feeling", "happier", "happiness"], "syn": ["glad", "cheerful", "joyful", "delighted"], "opp": ["sad", "unhappy"], "tip": "Happy has double p."}]}, {"week": 7, "date": "2026-10-27", "book": "The Broken Bangle", "items": [{"w": "busy outside", "key": "busy", "def": "Having lots of things to do.", "eg": "Mum was busy outside in the garden.", "uses": ["A busy street is full of people.", "A phone line is busy when someone else is using it."], "fam": ["busier", "busiest", "busily", "business"], "syn": ["occupied", "hard at work"], "opp": ["free", "idle"], "tip": "Busy sounds like 'bizzy' but is spelt b-u-s-y. Outside is out + side."}, {"w": "found a bangle", "key": "bangle", "def": "A bangle is a stiff ring of metal or glass worn around the wrist.", "eg": "She found a bangle under the bed.", "uses": ["Found is the past of find.", "To found a school means to start it."], "fam": ["bangles", "find", "finder"], "syn": ["bracelet"]}, {"w": "brand-new", "key": "brand-new", "def": "Completely new and never used before.", "eg": "Her bangle was brand-new and shiny.", "uses": ["A brand is the name of the company that makes something."], "fam": ["new", "newer", "newest", "brand"], "syn": ["new", "unused", "fresh"], "opp": ["old", "used"], "tip": "Keep the hyphen: brand-new."}, {"w": "beautiful", "key": "beautiful", "def": "Very pretty or lovely to see or hear.", "eg": "Grandma gave her a beautiful gold bangle.", "uses": ["A beautiful song is lovely to hear.", "A beautiful day is sunny and pleasant."], "fam": ["beauty", "beautifully"], "syn": ["pretty", "lovely", "gorgeous"], "opp": ["ugly"], "tip": "b-e-a-u-t-i-f-u-l. Ends in one l."}, {"w": "slipped off", "key": "slipped", "def": "Slid off easily without anyone meaning it to.", "eg": "The bangle slipped off her wrist.", "uses": ["She slipped on the wet floor: she slid and fell.", "He slipped out of the room: he left quietly."], "fam": ["slip", "slippery", "slipper", "slipping"], "syn": ["slid off", "fell off"], "tip": "Double p: sli-pp-ed. Off has double f."}, {"w": "broke into two", "key": "broke", "def": "Split into pieces. Broke is the past of break.", "eg": "The bangle fell and broke into two.", "uses": ["She broke the record: she did better than anyone before."], "fam": ["break", "broken", "breaking", "breakable"], "syn": ["cracked", "split", "snapped"], "tip": "Two (the number) is spelt t-w-o, not to or too."}, {"w": "expensive", "key": "expensive", "def": "Costing a lot of money.", "eg": "The gold bangle was very expensive.", "uses": ["An expensive mistake is one that costs a lot."], "fam": ["expense", "expensively"], "syn": ["costly", "dear", "pricey"], "opp": ["cheap"], "tip": "ex-pen-sive."}, {"w": "tried it on", "key": "tried", "def": "Put clothes or jewellery on to see if they fit or look nice.", "eg": "She tried it on to see how it looked.", "uses": ["Tried can mean had a go: She tried to swim across."], "fam": ["try", "tries", "trying"], "syn": ["put on", "tested"], "tip": "Try → tried: change y to i, then add -ed."}, {"w": "could not find", "key": "could", "def": "Was not able to discover where something was.", "eg": "She could not find the bangle anywhere.", "uses": ["Could is also polite: Could I have some water, please?"], "fam": ["can", "couldn't", "find", "found"], "syn": ["couldn't find", "lost"], "tip": "Could has a silent l: cou-l-d."}, {"w": "under the sofa", "key": "sofa", "def": "A sofa is a long, soft seat for two or more people.", "eg": "The bangle was hiding under the sofa.", "uses": ["Under can mean less than: It costs under ten dollars."], "fam": ["sofas"], "syn": ["couch", "settee"], "opp": ["on top of (for under)"]}]}, {"week": 8, "date": "2026-11-03", "book": "The Broken Bangle", "items": [{"w": "broken", "key": "broken", "def": "Damaged and not working, or in pieces.", "eg": "The broken bangle lay on the floor.", "uses": ["A broken promise is one that was not kept."], "fam": ["break", "broke", "breakable", "unbroken"], "syn": ["cracked", "smashed", "damaged"], "opp": ["whole", "fixed", "mended"]}, {"w": "present for you", "key": "present", "def": "A present is a gift you give someone.", "eg": "Here is a present for you!", "uses": ["At present means now.", "To present a prize means to give it out at a ceremony."], "fam": ["presents", "presented", "presentation"], "syn": ["gift", "surprise"]}, {"w": "wore new clothes", "key": "wore", "def": "Had clothes on your body. Wore is the past of wear.", "eg": "She wore new clothes to the party.", "uses": ["The shoes wore out: they got old from being used a lot."], "fam": ["wear", "worn", "wearing"], "syn": ["had on", "dressed in", "put on"], "tip": "Clothes is c-l-o-t-h-e-s. It sounds like 'close' but is spelt differently."}, {"w": "smiled and hugged", "key": "hugged", "def": "Smiled means made a happy face. Hugged means put your arms tightly around someone to show you care.", "eg": "Grandma smiled and hugged her.", "uses": ["A bear hug is a big, tight hug."], "fam": ["smile", "smiling", "hug", "hugging"], "syn": ["grinned", "beamed", "cuddled"], "opp": ["frowned (for smiled)"], "tip": "Hug → hugged: double g."}, {"w": "shine brighter", "key": "brighter", "def": "Shine means give out light or look bright. Brighter means more bright.", "eg": "Clean the bangle to make it shine brighter.", "uses": ["You can shine at something: be very good at it.", "'Rise and shine!' means wake up and get up."], "fam": ["shiny", "shone", "bright", "brightest", "brightly"], "syn": ["glow", "sparkle", "gleam"], "tip": "Bright has a silent gh: bri-gh-t."}, {"w": "the next day", "key": "next", "def": "The day after.", "eg": "The next day, she told Grandma the truth.", "uses": ["Next can mean beside: She sat next to me."], "fam": ["day", "daily", "today"], "syn": ["the following day"]}, {"w": "not happy", "key": "happy", "def": "Unhappy: feeling sad or cross.", "eg": "Grandma was not happy about the broken bangle.", "uses": ["Not turns words around: not easy, not fair, not happy."], "fam": ["happy", "happier", "happiness", "unhappy"], "syn": ["unhappy", "sad", "upset", "cross"], "opp": ["happy", "glad"]}, {"w": "telling the truth", "key": "truth", "def": "The truth is what really happened.", "eg": "She felt better after telling the truth.", "uses": ["Telling can also mean ordering: Mum is telling us to sleep."], "fam": ["true", "truly", "truthful", "tell", "told"], "syn": ["being honest", "owning up"], "opp": ["telling a lie"], "tip": "Telling has double l. Truth ends in th."}, {"w": "felt sorry", "key": "sorry", "def": "Felt sad about something you did, and wished you had not done it.", "eg": "She felt sorry for breaking the bangle.", "uses": ["To feel sorry for someone means to feel sad for them.", "'Sorry?' can mean 'What did you say?'"], "fam": ["sorrow", "sorrier"], "syn": ["apologetic", "sad", "regretful"], "tip": "Sorry has double r."}, {"w": "enjoyed herself", "key": "enjoyed", "def": "Had a good time.", "eg": "She enjoyed herself at the party.", "uses": ["Herself is for a girl or woman. For a boy, say himself."], "fam": ["enjoy", "enjoyable", "enjoyment", "joy"], "syn": ["had fun", "had a great time"], "tip": "en + joy + ed."}]}];
+const KEY = 'seahorse-spelling-v1';
+const PRAISE = ['Splash-tastic!','Shell yes!','Fin-tastic!','Spot on!','Whale done!','Super speller!'];
+const ALL = []; WEEKS.forEach(w => w.items.forEach((it, i) => { it.id = w.week + '-' + i; it.week = w.week; it.n = i + 1; ALL.push(it); }));
+
+/* ---------- data ---------- */
+function upcoming(){ const t = new Date(); t.setHours(0,0,0,0); const w = WEEKS.find(w => new Date(w.date + 'T23:59:59') >= t); return (w || WEEKS[WEEKS.length - 1]).week; }
+function fresh(){ return {week:upcoming(), sentence:true, stats:{}, dictWeek:null}; }
+let D = fresh();
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && typeof s === 'object') D = Object.assign(fresh(), s); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(D)); } catch(e){} }
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+function dayKey(d){ d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function stat(id){ return D.stats[id] || (D.stats[id] = {seen:0, right:0, streak:0, tricky:false, catchDays:[], last:0}); }
+function weekOf(n){ return WEEKS.find(w => w.week === n); }
+function dateLabel(s){ return new Date(s + 'T12:00:00').toLocaleDateString('en-GB', {day:'numeric', month:'short'}); }
+function norm(s){ return s.toLowerCase().replace(/[’‘`]/g, "'").replace(/\s+/g, ' ').trim(); }
+
+/* ---------- speech ---------- */
+let enVoice = null, sayTimer = null;
+function pickVoice(){ try { const vs = speechSynthesis.getVoices(); enVoice = vs.find(v => /en[-_]GB/i.test(v.lang)) || vs.find(v => /en[-_](SG|AU|IE|NZ)/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null; } catch(e){} }
+try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch(e){}
+function utter(text, rate){ const u = new SpeechSynthesisUtterance(text); u.lang = enVoice ? enVoice.lang : 'en-GB'; if (enVoice) u.voice = enVoice; u.rate = rate || 0.8; return u; }
+function say(text){ clearTimeout(sayTimer); try { speechSynthesis.cancel(); speechSynthesis.speak(utter(text)); } catch(e){} }
+/* like a teacher: word, sentence, word again */
+function sayTest(it, withSentence){
+  clearTimeout(sayTimer);
+  try {
+    speechSynthesis.cancel();
+    const a = utter(it.w, 0.75);
+    a.onend = () => { sayTimer = setTimeout(() => {
+      if (!withSentence){ try { speechSynthesis.speak(utter(it.w, 0.75)); } catch(e){} return; }
+      const b = utter(it.eg, 0.85);
+      b.onend = () => { sayTimer = setTimeout(() => { try { speechSynthesis.speak(utter(it.w, 0.75)); } catch(e){} }, 900); };
+      try { speechSynthesis.speak(b); } catch(e){}
+    }, 900); };
+    speechSynthesis.speak(a);
+  } catch(e){}
+}
+
+/* ---------- icons ---------- */
+const I = {
+  back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  close:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  speaker:(c='#fff', s=40) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>`,
+  del:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8C2F5A" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h11v14H9l-6-7z"/><path d="M12 9l5 6M17 9l-5 6"/></svg>',
+  chev:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6D4BB8" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
+  seahorse:(s=80) => `<svg width="${s*0.75}" height="${s}" viewBox="0 0 60 80" aria-hidden="true"><path d="M30 6c10 0 17 7 15 15-1 5-6 7-10 8 6 3 10 9 9 17-1 9-8 14-12 18-3 3-3 7 0 9 3 2 6 0 6-3" fill="none" stroke="#6D4BB8" stroke-width="9" stroke-linecap="round"/><path d="M28 7c-5 1-9 4-10 9l-11-1c-2 0-2 3 0 3l11 3c1 3 4 6 9 7" fill="#6D4BB8"/><circle cx="33" cy="14" r="2.6" fill="#fff"/><path d="M40 30l8 4-7 2M42 44l8 2-7 3" stroke="#F7D6E0" stroke-width="3" stroke-linecap="round" fill="none"/></svg>`
+};
+
+/* ---------- state ---------- */
+let screen = 'home', SES = null, C = null, DT = null, EXP = {week:null, id:null};
+
+/* ---------- home ---------- */
+function weekMastery(n){ const its = weekOf(n).items; return its.filter(it => { const s = D.stats[it.id]; return s && !s.tricky && s.streak >= 1; }).length / its.length; }
+function trickyList(){ return ALL.filter(it => D.stats[it.id]?.tricky).sort((a, b) => D.stats[b.id].last - D.stats[a.id].last); }
+function homeView(){
+  const w = weekOf(D.week), nextWk = upcoming(), tr = trickyList().length;
+  return `
+  <div class="brand">${I.seahorse(80)}<h1>Seahorse Spelling</h1><p>Hear it, spell it, know what it means</p></div>
+  <div class="card">
+    <span class="label">Spelling week</span>
+    <div class="weeks">${WEEKS.map(x => `<button class="wk ${x.week === D.week ? 'on' : ''}" data-act="week" data-arg="${x.week}" aria-pressed="${x.week === D.week}"><b>Week ${x.week}</b><small>${dateLabel(x.date)}</small>${x.week === nextWk ? '<span class="next">NEXT TEST</span>' : `<span class="meter"><i style="width:${Math.round(100 * weekMastery(x.week))}%"></i></span>`}</button>`).join('')}</div>
+    <p class="muted" style="font-size:13px">Book: <b>${esc(w.book)}</b> · test on ${dateLabel(w.date)}</p>
+  </div>
+  <button class="menu" data-act="spell"><span class="ico">abc</span><span class="txt"><span class="name">Spell it</span><span class="desc">Hear each one, then type the letters</span></span></button>
+  <button class="menu" data-act="dict" style="box-shadow:0 5px 0 #F3C4D0"><span class="ico" style="background:var(--pearl);color:var(--pearl-ink)">✎</span><span class="txt"><span class="name">Read-aloud spelling</span><span class="desc">On paper · you press Next · mark at the end</span></span></button>
+  <button class="menu lilac" data-act="explore"><span class="ico">Aa</span><span class="txt"><span class="name">Word Explorer</span><span class="desc">Meanings, other uses, word families, synonyms</span></span></button>
+  <button class="menu pink" data-act="go" data-arg="tricky"><span class="ico">!</span><span class="txt"><span class="name">Tricky words</span><span class="desc">${tr ? tr + ' to practise again' : 'None right now'}</span></span></button>
+  <div class="card">
+    <h2>Reading out</h2>
+    <div class="seg" role="group" aria-label="How words are read"><button class="${D.sentence ? 'on' : ''}" data-act="sent" data-arg="1">Word, sentence, word</button><button class="${!D.sentence ? 'on' : ''}" data-act="sent" data-arg="0">Word twice</button></div>
+    <p class="muted" style="font-size:13px">Like a teacher: the word, then a sentence using it, then the word again.</p>
+  </div>
+  <a class="link-btn" href="./">Mermaid Times</a>`;
+}
+
+/* ---------- spelling in the app ---------- */
+function startSpell(items, title){
+  SES = {title, items, i:0, res:[]};
+  openCard();
+}
+function openCard(){
+  C = {it:SES.items[SES.i], typed:'', tries:0, status:'todo', bad:null, msg:''};
+  go('spell');
+  setTimeout(() => sayTest(C.it, D.sentence), 250);
+}
+function header(title, i, n, res){
+  const prog = Array.from({length:n}, (_, k) => `<i class="${k < res.length ? res[k].mark : k === i ? 'now' : ''}"></i>`).join('');
+  return `<div class="top"><button class="icon-btn" data-act="quit" aria-label="Stop">${I.close}</button><h1>${esc(title)}</h1><span class="pill">${i + 1} / ${n}</span></div><div class="prog" aria-hidden="true">${prog}</div>`;
+}
+function wordsCount(w){ return w.trim().split(/\s+/).length; }
+function diffMarks(typed, target){
+  /* mark which typed letters match the target, using the longest common subsequence */
+  const a = [...typed], b = [...target], m = a.length, n = b.length;
+  const L = Array.from({length:m + 1}, () => Array(n + 1).fill(0));
+  for (let i = m - 1; i >= 0; i--) for (let j = n - 1; j >= 0; j--) L[i][j] = a[i] === b[j] ? L[i+1][j+1] + 1 : Math.max(L[i+1][j], L[i][j+1]);
+  const out = []; let i = 0, j = 0;
+  while (i < m && j < n){
+    if (a[i] === b[j]){ out.push({c:a[i], ok:true}); i++; j++; }
+    else if (L[i+1][j] >= L[i][j+1]){ out.push({c:a[i], ok:false}); i++; }
+    else { out.push({miss:true}); j++; }
+  }
+  while (i < m){ out.push({c:a[i], ok:false}); i++; }
+  while (j < n){ out.push({miss:true}); j++; }
+  return out;
+}
+function answerHtml(){
+  if (C.status === 'right' || C.status === 'fixed') return `<div class="answer ok">${esc(C.it.w)}</div>`;
+  if (C.status === 'shown') return `<div class="answer shown">${esc(C.it.w)}</div>`;
+  if (C.bad){
+    return `<div class="answer">${C.bad.map(x => x.miss ? '<span class="miss"></span>' : x.c === ' ' ? '<span class="sp"></span>' : x.ok ? esc(x.c) : `<span class="bad">${esc(x.c)}</span>`).join('')}</div>`;
+  }
+  return `<div class="answer">${[...C.typed].map(c => c === ' ' ? '<span class="sp"></span>' : esc(c)).join('')}<span class="caret"></span></div>`;
+}
+function spellView(){
+  const it = C.it, n = SES.items.length, done = C.status !== 'todo';
+  const words = wordsCount(it.w);
+  let fb = '';
+  if (C.status === 'right') fb = `<div class="fb ok"><b>${PRAISE[SES.i % PRAISE.length]}</b> “${esc(it.w)}”</div>`;
+  else if (C.status === 'fixed') fb = `<div class="fb ok"><b>You fixed it!</b> “${esc(it.w)}”</div>`;
+  else if (C.status === 'shown') fb = `<div class="fb tip"><b>Here’s how it’s spelt.</b>${it.tip ? ' ' + esc(it.tip) : ''}</div>`;
+  else if (C.msg) fb = `<div class="fb no">${C.msg}</div>`;
+  const def = done ? `<div class="fb def"><b>${esc(it.key)}:</b> ${esc(it.def)}${it.tip && C.status !== 'shown' ? `<br><span style="font-size:14px">Tip: ${esc(it.tip)}</span>` : ''}</div>` : '';
+  const keys = done ? `<div class="btn-row" style="margin-top:auto"><button class="btn" data-act="sayword">${I.speaker('#0A5660', 22)} Hear it</button><button class="btn coral" data-act="next">${SES.i === n - 1 ? 'See my score' : 'Next'}</button></div>` : keyboard();
+  return `${header(SES.title, SES.i, n, SES.res)}
+  <div class="listen">
+    <button class="bigsay" data-act="hear" aria-label="Hear it again">${I.speaker()}</button>
+    <div class="btn-row" style="justify-content:center;gap:8px"><button class="small-say" data-act="sayword">Word only</button><button class="small-say" data-act="saysent">In a sentence</button></div>
+    <span class="muted">${words === 1 ? '1 word' : words + ' words'}</span>
+  </div>
+  ${answerHtml()}
+  ${fb}${def}
+  ${!done && C.tries >= 1 ? `<button class="btn soft" data-act="showme" style="flex:none;min-height:44px">Show me</button>` : ''}
+  ${keys}`;
+}
+function keyboard(){
+  const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  return `<div class="kb" role="group" aria-label="Keyboard">
+    ${rows.map((r, k) => `<div class="r">${[...r].map(ch => `<button data-act="key" data-arg="${ch}">${ch}</button>`).join('')}${k === 2 ? `<button class="del" data-act="bk" aria-label="Delete">${I.del}</button>` : ''}</div>`).join('')}
+    <div class="r"><button class="wide" data-act="key" data-arg="'" style="flex:.5" aria-label="Apostrophe">’</button><button class="wide" data-act="key" data-arg="-" style="flex:.5" aria-label="Hyphen">-</button><button class="wide" data-act="key" data-arg=" " style="flex:2">space</button><button class="wide go" data-act="check" style="flex:1.2">Check</button></div>
+  </div>`;
+}
+function typeKey(k){
+  if (C.status !== 'todo') return;
+  C.bad = null; C.msg = '';
+  if (k === 'bk') C.typed = C.typed.slice(0, -1);
+  else if (C.typed.length < 40){ if (k === ' ' && (C.typed === '' || C.typed.endsWith(' '))) return; C.typed += k; }
+  render();
+}
+function check(){
+  if (!C.typed.trim()){ C.msg = '<b>Type the letters first.</b> Tap the speaker to hear it again.'; render(); return; }
+  C.tries++;
+  const t = norm(C.typed), target = norm(C.it.w);
+  if (t === target){ finish(C.tries === 1 ? 'right' : 'fixed'); return; }
+  C.bad = diffMarks(t, target);
+  const tw = t.split(' ').length, ww = target.split(' ').length;
+  C.msg = tw !== ww ? `<b>Nearly!</b> It has ${ww} ${ww === 1 ? 'word' : 'words'}. Check the spaces.` : `<b>Close!</b> Look at the red letters. A gap means a letter is missing.`;
+  if (C.tries >= 2 && C.it.tip) C.msg += `<br>Tip: ${esc(C.it.tip)}`;
+  render();
+}
+function finish(status){
+  C.status = status;
+  const s = stat(C.it.id), today = dayKey(); s.seen++; s.last = Date.now();
+  if (status === 'right'){ s.right++; s.streak++; if (s.tricky){ if (!s.catchDays.includes(today)) s.catchDays.push(today); if (s.streak >= 2 && s.catchDays.length >= 2){ s.tricky = false; s.catchDays = []; } } }
+  else { s.streak = 0; s.tricky = true; s.catchDays = []; }
+  SES.res.push({it:C.it, mark: status === 'right' ? 'ok' : status === 'fixed' ? 'fix' : 'miss'});
+  save(); render();
+}
+function resultsView(){
+  const r = SES.res, ok = r.filter(x => x.mark === 'ok').length;
+  return `<div class="app res" style="padding:8px 0 0;flex:1;gap:12px">
+    ${I.seahorse(90)}
+    <h1>${ok === r.length ? 'Super speller!' : 'Lovely work!'}</h1>
+    <div class="big">${ok} / ${r.length}</div>
+    <p class="muted">right first time</p>
+    <div class="list">${r.map(x => `<div class="li"><span class="w">${esc(x.it.w)}</span><span class="m ${x.mark}">${x.mark === 'ok' ? 'Right' : x.mark === 'fix' ? 'Fixed' : 'Learning'}</span></div>`).join('')}</div>
+    <div class="btn-row" style="width:100%;margin-top:auto"><button class="btn" data-act="go" data-arg="home">Home</button>
+    ${r.some(x => x.mark !== 'ok') ? `<button class="btn coral" data-act="redo" style="flex:1.4">Try the misses again</button>` : `<button class="btn coral" data-act="spell" style="flex:1.4">Again</button>`}</div>
+  </div>`;
+}
+
+/* ---------- read-aloud on paper ---------- */
+function startDict(){ DT = {items:weekOf(D.week).items.slice(), i:0, marks:{}, saved:false}; go('dict'); sayTest(DT.items[0], D.sentence); }
+function dictView(){
+  const n = DT.items.length;
+  return `<div class="top"><button class="icon-btn" data-act="dictquit" aria-label="Stop">${I.close}</button><h1>Week ${D.week} spelling</h1><span class="pill">${DT.i + 1} / ${n}</span></div>
+  <div class="prog" aria-hidden="true">${DT.items.map((_, k) => `<i class="${k < DT.i ? 'ok' : k === DT.i ? 'now' : ''}"></i>`).join('')}</div>
+  <div class="dict">
+    <div class="num">${DT.i + 1}</div>
+    <p class="muted" style="font-size:16px">Listen, then write it on your paper.</p>
+    <button class="bigsay" data-act="dictsay" aria-label="Say it again">${I.speaker()}</button>
+    <div class="btn-row" style="justify-content:center;gap:8px"><button class="small-say" data-act="dictword">Word only</button><button class="small-say" data-act="dictsent">In a sentence</button></div>
+  </div>
+  <div class="btn-row"><button class="btn" data-act="dictprev" ${DT.i === 0 ? 'disabled' : ''}>Back</button><button class="btn coral" data-act="dictnext" style="flex:1.6">${DT.i === n - 1 ? 'Finish · show answers' : 'Next'}</button></div>`;
+}
+function sheetView(){
+  const n = DT.items.length, right = Object.values(DT.marks).filter(v => v === 'ok').length, marked = Object.keys(DT.marks).length;
+  return `<div class="top"><button class="icon-btn" data-act="go" data-arg="home" aria-label="Home">${I.back}</button><h1>Answers</h1><span class="pill">${right} / ${n}</span></div>
+  <p class="muted">Mark her paper here. Words marked ✗ go to Tricky words.</p>
+  <div class="list">${DT.items.map((it, k) => { const m = DT.marks[k];
+    return `<div class="sheet-row"><span class="n">${k + 1}</span><span class="a">${esc(it.w)}</span><button class="mk ok ${m === 'ok' ? 'on' : ''}" data-act="mark" data-arg="${k},ok" aria-label="Right">✓</button><button class="mk no ${m === 'no' ? 'on' : ''}" data-act="mark" data-arg="${k},no" aria-label="Wrong">✗</button></div>`; }).join('')}</div>
+  <div class="btn-row"><button class="btn" data-act="dictagain">Read it again</button><button class="btn coral" data-act="dictsave" style="flex:1.4" ${marked ? '' : 'disabled'}>${DT.saved ? 'Saved' : 'Save marks'}</button></div>`;
+}
+function saveMarks(){
+  const today = dayKey();
+  Object.entries(DT.marks).forEach(([k, m]) => { const it = DT.items[+k], s = stat(it.id); s.seen++; s.last = Date.now();
+    if (m === 'ok'){ s.right++; s.streak++; if (s.tricky){ if (!s.catchDays.includes(today)) s.catchDays.push(today); if (s.streak >= 2 && s.catchDays.length >= 2){ s.tricky = false; s.catchDays = []; } } }
+    else { s.streak = 0; s.tricky = true; s.catchDays = []; } });
+  DT.saved = true; save(); render();
+}
+
+/* ---------- word explorer ---------- */
+function exploreView(){
+  const w = weekOf(EXP.week || D.week);
+  return `<div class="top"><button class="icon-btn" data-act="go" data-arg="home" aria-label="Back">${I.back}</button><h1>Word Explorer</h1><span style="width:44px"></span></div>
+  <div class="weeks">${WEEKS.map(x => `<button class="wk ${x.week === w.week ? 'on' : ''}" data-act="exweek" data-arg="${x.week}"><b>Week ${x.week}</b><small>${esc(x.book)}</small></button>`).join('')}</div>
+  <div class="wlist">${w.items.map(it => `<button class="witem" data-act="exword" data-arg="${it.id}"><span class="n">${it.n}</span><span class="t"><b>${esc(it.w)}</b><span>${esc(it.def)}</span></span>${I.chev}</button>`).join('')}</div>`;
+}
+function wordView(){
+  const it = ALL.find(x => x.id === EXP.id), w = weekOf(it.week), idx = w.items.indexOf(it);
+  const tags = (arr, cls) => `<div class="tags">${arr.map(x => `<span class="tag ${cls || ''}">${esc(x)}</span>`).join('')}</div>`;
+  return `<div class="top"><button class="icon-btn" data-act="go" data-arg="explore" aria-label="Back to the list">${I.back}</button><h1>Week ${it.week} · ${it.n} of ${w.items.length}</h1><span style="width:44px"></span></div>
+  <div class="wcard">
+    <div class="head"><h2>${esc(it.w)}</h2><button class="say-sm" data-act="exsay" aria-label="Say it">${I.speaker('#6D4BB8', 22)}</button></div>
+    ${it.key !== it.w ? `<span class="key">Key word: <b>${esc(it.key)}</b></span>` : ''}
+    <div class="sec"><h3>What it means</h3><p>${esc(it.def)}</p></div>
+    <div class="sec"><h3>In a sentence</h3><div class="row" style="display:flex;gap:8px;align-items:center"><p class="eg" style="flex:1">${esc(it.eg)}</p><button class="say-sm" data-act="exsayeg" aria-label="Say the sentence">${I.speaker('#6D4BB8', 20)}</button></div></div>
+    ${it.uses && it.uses.length ? `<div class="sec"><h3>Other ways to use it</h3><ul>${it.uses.map(u => `<li>${esc(u)}</li>`).join('')}</ul></div>` : ''}
+    ${it.fam && it.fam.length ? `<div class="sec"><h3>Word family</h3>${tags(it.fam, 'fam')}</div>` : ''}
+    ${it.syn && it.syn.length ? `<div class="sec"><h3>Words that mean the same</h3>${tags(it.syn)}</div>` : ''}
+    ${it.opp && it.opp.length ? `<div class="sec"><h3>Opposites</h3>${tags(it.opp, 'opp')}</div>` : ''}
+    ${it.tip ? `<div class="fb tip"><b>Spelling tip:</b> ${esc(it.tip)}</div>` : ''}
+  </div>
+  <div class="btn-row"><button class="btn" data-act="exstep" data-arg="-1" ${idx === 0 ? 'disabled' : ''}>Previous</button><button class="btn lilac" data-act="exstep" data-arg="1" ${idx === w.items.length - 1 ? 'disabled' : ''}>Next word</button></div>`;
+}
+function trickyView(){
+  const list = trickyList();
+  return `<div class="top"><button class="icon-btn" data-act="go" data-arg="home" aria-label="Back">${I.back}</button><h1>Tricky words</h1><span style="width:44px"></span></div>
+  <p class="muted">A word is set free after she spells it right 2 times in a row, on 2 different days.</p>
+  ${list.length ? `<div class="list">${list.map(it => `<div class="li"><span class="w">${esc(it.w)}</span><span class="muted" style="font-size:12px">Week ${it.week}</span></div>`).join('')}</div>
+  <button class="btn coral" data-act="trickygo" style="flex:none;margin-top:auto">Practise these now</button>` : `<div class="card" style="align-items:center;text-align:center">${I.seahorse(70)}<h2>No tricky words!</h2><p class="muted">Words she misspells will show up here.</p></div>`}`;
+}
+
+/* ---------- render ---------- */
+const VIEWS = {home:homeView, spell:spellView, results:resultsView, dict:dictView, sheet:sheetView, explore:exploreView, word:wordView, tricky:trickyView};
+function render(){ $('app').innerHTML = VIEWS[screen](); }
+function go(s){ const c = s !== screen; screen = s; render(); if (c) window.scrollTo(0, 0); }
+function stopSpeech(){ clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch(_){} }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t || t.disabled) return;
+  const a = t.dataset.act, arg = t.dataset.arg;
+  switch (a){
+    case 'go': stopSpeech(); go(arg); break;
+    case 'week': D.week = +arg; save(); render(); break;
+    case 'sent': D.sentence = arg === '1'; save(); render(); break;
+    case 'spell': startSpell(shuffle(weekOf(D.week).items), 'Week ' + D.week); break;
+    case 'redo': startSpell(SES.res.filter(x => x.mark !== 'ok').map(x => x.it), 'Try again'); break;
+    case 'trickygo': startSpell(shuffle(trickyList()).slice(0, 10), 'Tricky words'); break;
+    case 'quit': case 'dictquit': stopSpeech(); go('home'); break;
+    case 'hear': sayTest(C.it, D.sentence); break;
+    case 'sayword': say(C.it.w); break;
+    case 'saysent': say(C.it.eg); break;
+    case 'key': typeKey(arg); break;
+    case 'bk': typeKey('bk'); break;
+    case 'check': check(); break;
+    case 'showme': finish('shown'); break;
+    case 'next': stopSpeech(); if (SES.i < SES.items.length - 1){ SES.i++; openCard(); } else go('results'); break;
+    case 'dict': startDict(); break;
+    case 'dictsay': sayTest(DT.items[DT.i], D.sentence); break;
+    case 'dictword': say(DT.items[DT.i].w); break;
+    case 'dictsent': say(DT.items[DT.i].eg); break;
+    case 'dictnext': if (DT.i < DT.items.length - 1){ DT.i++; render(); sayTest(DT.items[DT.i], D.sentence); } else { stopSpeech(); go('sheet'); } break;
+    case 'dictprev': if (DT.i > 0){ DT.i--; render(); sayTest(DT.items[DT.i], D.sentence); } break;
+    case 'dictagain': DT.i = 0; go('dict'); sayTest(DT.items[0], D.sentence); break;
+    case 'mark': { const [k, m] = arg.split(','); if (DT.marks[k] === m) delete DT.marks[k]; else DT.marks[k] = m; DT.saved = false; render(); break; }
+    case 'dictsave': saveMarks(); break;
+    case 'explore': EXP.week = D.week; go('explore'); break;
+    case 'exweek': EXP.week = +arg; render(); break;
+    case 'exword': EXP.id = arg; go('word'); break;
+    case 'exsay': say(ALL.find(x => x.id === EXP.id).w); break;
+    case 'exsayeg': say(ALL.find(x => x.id === EXP.id).eg); break;
+    case 'exstep': { const it = ALL.find(x => x.id === EXP.id), w = weekOf(it.week), j = w.items.indexOf(it) + (+arg); if (w.items[j]){ EXP.id = w.items[j].id; render(); window.scrollTo(0, 0); } break; }
+  }
+});
+document.addEventListener('keydown', e => {
+  if (screen !== 'spell' || !C || C.status !== 'todo') return;
+  if (/^[a-zA-Z' -]$/.test(e.key)){ e.preventDefault(); typeKey(e.key.toLowerCase()); }
+  else if (e.key === 'Backspace'){ e.preventDefault(); typeKey('bk'); }
+  else if (e.key === 'Enter'){ e.preventDefault(); check(); }
+});
+render();
+})();
+</script>
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});</script>
+</body>
+</html>

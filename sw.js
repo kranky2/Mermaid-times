@@ -1,8 +1,8 @@
 /* Offline support for Mermaid Times and Shell Sums.
    Pages: try the network first (so updates arrive), fall back to the saved copy when offline.
    Fonts: saved the first time they load, then used from the phone. */
-const CACHE = 'mermaid-times-v3';
-const CORE = ['./', './index.html', './sums.html', './manifest.webmanifest', './icon-180.png', './icon-512.png', './chinese.html', './hanzi-writer.min.js', './hanzi-data.js'];
+const CACHE = 'mermaid-times-v4';
+const CORE = ['./', './index.html', './sums.html', './manifest.webmanifest', './icon-180.png', './icon-512.png', './chinese.html', './hanzi-writer.min.js', './hanzi-data.js', './english.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

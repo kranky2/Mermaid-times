@@ -40,3 +40,12 @@ Chinese spelling (听写) for the P1 1B lists, lessons 15 to 19. Every word is p
 Pinyin for section 二 words is not on the school list, so standard Hanyu Pinyin is used; common alternatives (like xué sheng / xué shēng) are accepted.
 
 Character drawing uses [Hanzi Writer](https://hanziwriter.org) (MIT, see `LICENSE-hanzi-writer.txt`) with stroke data from hanzi-writer-data (Arphic Public License, see `ARPHICPL.TXT`). Both are bundled, so it works offline too.
+
+## Seahorse Spelling (`english.html`)
+
+English spelling for the P1 Term 4 list (weeks 2, 3, 4, 6, 7, 8). The next test week is picked automatically.
+
+- **Spell it:** the phone says the word, a sentence using it, then the word again (or just the word twice). She types the letters on an on-screen keyboard (with space, apostrophe and hyphen). Wrong letters show in red and missing letters as gaps; after one try, Show me reveals it with a spelling tip.
+- **Read-aloud spelling (on paper):** the phone reads each item; a grown-up presses Next; answer sheet to mark at the end; ✗ goes to Tricky words.
+- **Word Explorer:** for every item, a child-friendly meaning, an example sentence, other ways to use the word, its word family, words that mean the same, opposites and a spelling tip.
+- **Tricky words:** misspelt items come back until right 2 times in a row on 2 different days.
