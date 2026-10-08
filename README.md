@@ -35,6 +35,7 @@ Chinese spelling (听写) for the P1 1B lists, lessons 15 to 19. Every word is p
 - **Strokes (笔画):** she draws the named stroke inside an example character (横折弯 in 朵, 横折斜钩 in 风, 斜钩 in 我, 卧钩 in 心).
 - **Mock 听写:** one lesson exactly as the school tests it, scored out of the total.
 - **Tricky words:** anything missed comes back until it is right 2 times in a row on 2 different days.
+- **Read-aloud 听写 (on paper):** the phone reads each word twice and shows whether to write 汉字 or 汉语拼音; a grown-up presses Next. Like the test, or every word both ways. At the end, an answer sheet to mark her paper; ✗ marks go to Tricky words.
 
 Pinyin for section 二 words is not on the school list, so standard Hanyu Pinyin is used; common alternatives (like xué sheng / xué shēng) are accepted.
 

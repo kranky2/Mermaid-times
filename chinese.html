@@ -140,6 +140,28 @@ button,input{font:inherit;color:inherit}
 .meter{width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.5);overflow:hidden}
 .chip:not(.on) .meter{background:#D4E6EA}
 .meter i{display:block;height:100%;background:var(--gold)}
+/* read-aloud tingxie */
+.dict{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.dict .num{font-family:var(--display);font-weight:800;font-size:64px;line-height:1;color:var(--teal)}
+.dict .what{font-weight:800;font-size:20px;border-radius:16px;padding:10px 18px}
+.dict .what.hz{background:var(--pearl);color:var(--pearl-ink)}
+.dict .what.py{background:var(--foam);color:var(--foam-ink)}
+.dict .what.st{background:var(--sand);color:var(--sand-ink)}
+.dict .what span{font-family:var(--han);font-size:22px;margin-left:6px}
+.dict .boxes{display:flex;gap:8px}
+.dict .bx{width:44px;height:44px;border:2px solid #B9CAD3;border-radius:8px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#7B8B96;box-sizing:border-box}
+.dict .bx.skip{border-style:dashed;background:#F3F6F8}
+.bigsay{border:0;cursor:pointer;width:84px;height:84px;border-radius:42px;background:var(--teal);box-shadow:0 5px 0 var(--teal-deep);display:flex;align-items:center;justify-content:center}
+.sheet-row{background:var(--card);border-radius:14px;padding:8px 10px;display:flex;align-items:center;gap:10px}
+.sheet-row .n{font-weight:800;color:var(--ink-soft);min-width:24px}
+.sheet-row .a{flex:1;text-align:left}
+.sheet-row .a .w{font-family:var(--han);font-size:22px}
+.sheet-row .a .p{font-weight:700;color:var(--ink-soft);font-size:14px}
+.sheet-row .a .k{font-size:12px;font-weight:800;color:var(--ink-soft)}
+.mk{border:0;cursor:pointer;width:44px;height:44px;border-radius:12px;background:var(--lagoon);font-weight:800;font-size:18px}
+.mk.on.ok{background:var(--teal);color:#fff}
+.mk.on.no{background:var(--coral);color:#fff}
+.sec{font-weight:800;font-size:13px;letter-spacing:1px;color:var(--ink-soft);margin-top:4px}
 :focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -159,7 +181,7 @@ const KEY = 'pearl-tingxie-v1';
 const PRAISE = ['Shell yes!','Fin-tastic!','Pearl-fect!','Splash-tastic!','好棒!','Whale done!'];
 
 /* ---------- data ---------- */
-function fresh(){ return {lessons:[19], paper:false, outline:false, stats:{}, days:{}}; }
+function fresh(){ return {lessons:[19], paper:false, outline:false, stats:{}, days:{}, dictL:19, dictWay:'test', dictChars:true}; }
 let D = fresh();
 try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && typeof s === 'object') D = Object.assign(fresh(), s); } catch(e){}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(D)); } catch(e){} }
@@ -439,6 +461,86 @@ function nextCard(){
   else go('results');
 }
 
+/* ---------- read-aloud 听写 (on paper) ---------- */
+let DT = null, sayTimer = null;
+function sayTwice(text){
+  clearTimeout(sayTimer);
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'zh-CN'; if (zhVoice) u.voice = zhVoice; u.rate = 0.7;
+    u.onend = () => { sayTimer = setTimeout(() => { if (screen === 'dict') say(text); }, 2200); };
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+function dictText(c){ return c.dir === 'stroke' ? c.it.w : plain(c.it); }
+function startDict(){
+  const l = D.dictL, its = ITEMS.filter(it => it.l === l), cards = [];
+  if (D.dictWay === 'test'){
+    its.filter(it => it.test === 'py').forEach(it => cards.push({it, dir:'py'}));
+    its.filter(it => it.test === 'hz').forEach(it => cards.push({it, dir:'hz'}));
+  } else {
+    its.filter(it => it.test !== 'stroke').forEach(it => cards.push({it, dir:'py'}));
+    its.filter(it => it.test !== 'stroke').forEach(it => cards.push({it, dir:'hz'}));
+  }
+  its.filter(it => it.test === 'stroke').forEach(it => cards.push({it, dir:'stroke'}));
+  DT = {cards, i:0, marks:{}, saved:false};
+  go('dict'); sayTwice(dictText(cards[0]));
+}
+function dictView(){
+  const c = DT.cards[DT.i], n = DT.cards.length, it = c.it;
+  let what, extra = '';
+  if (c.dir === 'py'){
+    what = `<div class="what py">Write the Hanyu Pinyin<span>汉语拼音</span></div>`;
+    if (D.dictChars) extra = `<div class="han" style="display:flex;gap:6px">${chars(it).map(x => hanSpan(x.ch, 72)).join('')}</div>`;
+  } else if (c.dir === 'hz'){
+    const cs = chars(it);
+    what = `<div class="what hz">Write the word<span>汉字</span></div>`;
+    extra = `<div class="boxes" aria-label="${cs.length} characters">${cs.map(x => `<span class="bx ${x.given ? 'skip' : ''}">${x.given ? 'skip' : ''}</span>`).join('')}</div>` + (cs.some(x => x.given) ? `<p class="muted">Leave the dashed box empty. It isn’t tested.</p>` : `<p class="muted">${cs.length} ${cs.length === 1 ? 'character' : 'characters'}</p>`);
+  } else {
+    what = `<div class="what st">Write the stroke<span>笔画</span></div>`;
+    extra = `<div style="font-family:var(--han);font-size:40px">${esc(it.w)}</div><div class="muted" style="font-size:16px;font-weight:700">${esc(it.py)}</div>`;
+  }
+  const sectionChange = DT.i > 0 && DT.cards[DT.i - 1].dir !== c.dir;
+  return `<div class="top"><button class="icon-btn" data-act="dictquit" aria-label="Stop">${I.close}</button><h1>听写（${LESSON_NAME[D.dictL]}）</h1><span class="pill">${DT.i + 1} / ${n}</span></div>
+  <div class="prog" aria-hidden="true">${DT.cards.map((_, k) => `<i class="${k < DT.i ? 'ok' : k === DT.i ? 'now' : ''}"></i>`).join('')}</div>
+  <div class="dict">
+    ${sectionChange ? `<div class="fb tip"><b>New section!</b> Now ${c.dir === 'hz' ? 'write the words in 汉字' : c.dir === 'py' ? 'write the Hanyu Pinyin' : 'write the strokes'}.</div>` : ''}
+    <div class="num">${DT.i + 1}</div>
+    ${what}
+    ${extra}
+    <button class="bigsay" data-act="dictsay" aria-label="Say it again"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+    <p class="muted">Each word is read twice. Tap to hear it again.</p>
+  </div>
+  <div class="btn-row"><button class="btn" data-act="dictprev" ${DT.i === 0 ? 'disabled' : ''}>Back</button><button class="btn coral" data-act="dictnext" style="flex:1.6">${DT.i === n - 1 ? 'Finish · show answers' : 'Next'}</button></div>`;
+}
+function sheetView(){
+  const n = DT.cards.length, marked = Object.keys(DT.marks).length, right = Object.values(DT.marks).filter(v => v === 'ok').length;
+  let prevDir = null;
+  const rows = DT.cards.map((c, k) => {
+    const it = c.it, head = c.dir !== prevDir ? `<div class="sec">${c.dir === 'py' ? '看汉字写汉语拼音' : c.dir === 'hz' ? '听写汉字' : '汉字笔画'}</div>` : ''; prevDir = c.dir;
+    let ans;
+    if (c.dir === 'py') ans = `<div class="p" style="font-size:18px;color:var(--ink)">${esc(pyMain(it))}</div><div class="w" style="font-size:16px">${esc(plain(it))}</div>`;
+    else if (c.dir === 'hz') ans = `<div class="w">${chars(it).map(x => x.given ? `<span style="color:#9DB0BC">(${esc(x.ch)})</span>` : esc(x.ch)).join('')}</div><div class="p">${esc(pyMain(it))}</div>`;
+    else ans = `<div class="row" style="justify-content:flex-start;gap:8px">${hanSpan(it.ex, 40)}<div><div class="w" style="font-size:18px">${esc(it.w)}</div><div class="k">in ${esc(it.ex)}</div></div></div>`;
+    const m = DT.marks[k];
+    return head + `<div class="sheet-row"><span class="n">${k + 1}</span><div class="a">${ans}</div>
+      <button class="mk ok ${m === 'ok' ? 'on' : ''}" data-act="mark" data-arg="${k},ok" aria-label="Right">✓</button><button class="mk no ${m === 'no' ? 'on' : ''}" data-act="mark" data-arg="${k},no" aria-label="Wrong">✗</button></div>`;
+  }).join('');
+  return `<div class="top"><button class="icon-btn" data-act="go" data-arg="home" aria-label="Home">${I.back}</button><h1>Answers</h1><span class="pill">${right} / ${n}</span></div>
+  <p class="muted">Mark her paper here. Words marked ✗ go to Tricky words so she can practise them.</p>
+  <div class="list">${rows}</div>
+  <div class="btn-row"><button class="btn" data-act="dictagain">Read it again</button><button class="btn coral" data-act="dictsave" style="flex:1.4" ${marked ? '' : 'disabled'}>${DT.saved ? 'Saved' : 'Save marks'}</button></div>`;
+}
+function saveDictMarks(){
+  const today = dayKey();
+  Object.entries(DT.marks).forEach(([k, m]) => {
+    const c = DT.cards[+k], st = stat(sk(c.it, c.dir)); st.seen++; st.last = Date.now();
+    if (m === 'ok'){ st.right++; st.streak++; if (st.tricky){ if (!st.catchDays.includes(today)) st.catchDays.push(today); if (st.streak >= 2 && st.catchDays.length >= 2){ st.tricky = false; st.catchDays = []; } } }
+    else { st.wrong++; st.streak = 0; st.tricky = true; st.catchDays = []; }
+  });
+  DT.saved = true; save(); render();
+}
+
 /* ---------- home ---------- */
 function lessonMastery(l){
   const cs = []; ITEMS.filter(it => it.l === l).forEach(it => dirsOf(it).forEach(d => cs.push(D.stats[sk(it, d)])));
@@ -460,6 +562,14 @@ function homeView(){
     <p class="muted">Just like the test: pinyin for section 一, characters for section 二, and the strokes.</p>
     <div class="chips">${[15,16,17,18,19].map(l => `<button class="chip ${mockL === l ? 'on' : ''}" data-act="mockl" data-arg="${l}"><span style="font-family:var(--han)">${LESSON_NAME[l]}</span></button>`).join('')}</div>
     <button class="btn coral" data-act="mock" data-arg="${mockL}" style="flex:none">Start 听写（${LESSON_NAME[mockL]}）</button>
+  </div>
+  <div class="card">
+    <h2>Read-aloud 听写 · on paper</h2>
+    <p class="muted">The phone reads each word twice and shows whether to write 汉字 or 汉语拼音. You press Next. Answers to mark at the end.</p>
+    <div class="chips">${[15,16,17,18,19].map(l => `<button class="chip ${D.dictL === l ? 'on' : ''}" data-act="dictl" data-arg="${l}"><span style="font-family:var(--han)">${LESSON_NAME[l]}</span></button>`).join('')}</div>
+    <div class="seg" role="group" aria-label="Which way"><button class="${D.dictWay === 'test' ? 'on' : ''}" data-act="dictway" data-arg="test">Like the test</button><button class="${D.dictWay === 'both' ? 'on' : ''}" data-act="dictway" data-arg="both">Every word both ways</button></div>
+    <div class="seg" role="group" aria-label="Pinyin questions"><button class="${D.dictChars ? 'on' : ''}" data-act="dictchars" data-arg="1">Show 汉字 for pinyin</button><button class="${!D.dictChars ? 'on' : ''}" data-act="dictchars" data-arg="0">Sound only</button></div>
+    <button class="btn teal" data-act="dictstart" style="flex:none">Start reading 听写（${LESSON_NAME[D.dictL]}）</button>
   </div>
   <button class="menu pink" data-act="go" data-arg="tricky"><span class="ico">难</span><span class="txt"><span class="name">Tricky words</span><span class="desc">${tr ? tr + ' to practise again' : 'None right now'}</span></span></button>
   <div class="card">
@@ -494,7 +604,7 @@ function resultsView(){
 }
 
 /* ---------- render ---------- */
-const VIEWS = {home:homeView, card:cardView, tricky:trickyView, results:resultsView};
+const VIEWS = {home:homeView, card:cardView, tricky:trickyView, results:resultsView, dict:dictView, sheet:sheetView};
 function render(){ $('app').innerHTML = VIEWS[screen](); fillStatics(); }
 function go(s){ const c = s !== screen; screen = s; render(); if (c) window.scrollTo(0, 0); if (s === 'card' && C && C.status === 'todo' && (C.dir === 'stroke' || (C.dir === 'hz' && !D.paper))) mountWriter(); }
 
@@ -509,6 +619,17 @@ document.addEventListener('click', e => {
     case 'outline': D.outline = arg === '1'; save(); render(); break;
     case 'practice': if (D.lessons.length) startSession('practice', buildPractice(), 'Practice'); break;
     case 'mock': D.mockL = +arg || D.mockL || 19; save(); startMock(D.mockL); break;
+    case 'dictl': D.dictL = +arg; save(); render(); break;
+    case 'dictway': D.dictWay = arg; save(); render(); break;
+    case 'dictchars': D.dictChars = arg === '1'; save(); render(); break;
+    case 'dictstart': startDict(); break;
+    case 'dictsay': sayTwice(dictText(DT.cards[DT.i])); break;
+    case 'dictnext': if (DT.i < DT.cards.length - 1){ DT.i++; render(); sayTwice(dictText(DT.cards[DT.i])); } else { clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch(_){} go('sheet'); } break;
+    case 'dictprev': if (DT.i > 0){ DT.i--; render(); sayTwice(dictText(DT.cards[DT.i])); } break;
+    case 'dictquit': clearTimeout(sayTimer); try { speechSynthesis.cancel(); } catch(_){} go('home'); break;
+    case 'dictagain': DT.i = 0; go('dict'); sayTwice(dictText(DT.cards[0])); break;
+    case 'mark': { const [k, m] = arg.split(','); DT.marks[k] = DT.marks[k] === m ? undefined : m; if (DT.marks[k] === undefined) delete DT.marks[k]; DT.saved = false; render(); break; }
+    case 'dictsave': saveDictMarks(); break;
     case 'trickygo': startSession('practice', spread(shuffle(trickyCards().map(c => ({it:c.it, dir:c.dir})))).slice(0, 12), 'Tricky words'); break;
     case 'redo': startSession('practice', SES.res.filter(x => x.mark !== 'ok').map(x => ({it:x.it, dir:x.dir})), 'Try again'); break;
     case 'quit': try { speechSynthesis.cancel(); } catch(_){} writer = null; go('home'); break;
