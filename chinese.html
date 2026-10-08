@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pearl Tingxie">
+<meta name="theme-color" content="#E7F6F7">
+<title>Pearl Tingxie</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: one phone-width column in the Mermaid Times lagoon look; Chinese is drawn in kaishu stroke data so it matches how she is taught to write. Single light look on purpose. */
+:root{
+  color-scheme: light;
+  --lagoon:#E7F6F7; --card:#FFFFFF; --grid:#E7B9C8;
+  --ink:#123B57; --ink-soft:#3F6178;
+  --teal:#0E7480; --teal-deep:#0A5660; --foam:#C6EEE8; --foam-ink:#0A5660;
+  --coral:#C9452F; --coral-deep:#8E2E1F; --coral-tint:#FDE3DC;
+  --sand:#FFF1D6; --sand-ink:#7A5A12; --gold:#F2B630;
+  --pearl:#F7D6E0; --pearl-ink:#8C2F5A; --lilac:#6D4BB8;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+  --han:"Kaiti SC","STKaiti","KaiTi","PingFang SC","Noto Sans SC",serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%}
+body{margin:0;background:var(--lagoon);color:var(--ink);font-family:var(--body);font-size:16px;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+.app{max-width:440px;margin:0 auto;min-height:100%;box-sizing:border-box;padding-inline:16px;padding-block:16px 20px;display:flex;flex-direction:column;gap:12px}
+.app>*{min-width:0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top h1{flex:1;margin:0;text-align:center;font-family:var(--display);font-weight:700;font-size:21px;line-height:1.1}
+.icon-btn{border:0;cursor:pointer;width:44px;height:44px;flex-shrink:0;border-radius:22px;background:var(--card);display:flex;align-items:center;justify-content:center}
+.pill{background:var(--card);border-radius:18px;padding:8px 12px;font-weight:800;font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.card{background:var(--card);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:16px;font-weight:800}
+.muted{color:var(--ink-soft);font-size:14px;margin:0;line-height:1.45}
+.brand{text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}
+.brand h1{margin:0;font-family:var(--display);font-weight:800;font-size:40px;line-height:1;color:var(--teal)}
+.brand .zh{font-family:var(--han);font-size:22px;color:var(--pearl-ink)}
+.brand p{margin:0;color:var(--ink-soft);font-size:15px}
+.label{font-weight:800;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-soft)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:0;cursor:pointer;padding:8px 12px;border-radius:16px;background:var(--lagoon);font-weight:800;font-size:14px;min-height:42px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.chip.on{background:var(--teal);color:#fff}
+.chip small{font-size:11px;font-weight:700;opacity:.85}
+.seg{display:flex;background:var(--lagoon);border-radius:20px;padding:4px;gap:2px}
+.seg button{border:0;cursor:pointer;flex:1;min-height:42px;border-radius:16px;background:transparent;font-weight:800;font-size:14px}
+.seg button.on{background:var(--ink);color:#fff}
+.menu{border:0;cursor:pointer;text-align:left;width:100%;background:var(--card);border-radius:22px;padding:14px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 5px 0 var(--foam)}
+.menu .ico{width:50px;height:50px;border-radius:16px;background:var(--foam);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--han);font-size:28px;color:var(--teal-deep)}
+.menu .txt{flex:1;display:flex;flex-direction:column;min-width:0}
+.menu .name{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.15}
+.menu .desc{font-size:14px;color:var(--ink-soft)}
+.menu.teal{background:var(--teal);color:#fff;box-shadow:0 5px 0 var(--teal-deep)}
+.menu.teal .ico{background:#fff}
+.menu.teal .desc{color:#D9F3F1}
+.menu.pink{box-shadow:0 5px 0 #F3C4D0}
+.menu.pink .ico{background:var(--pearl);color:var(--pearl-ink)}
+.btn{border:0;cursor:pointer;min-height:50px;border-radius:18px;background:var(--card);font-weight:800;font-size:15px;color:var(--teal-deep);display:flex;align-items:center;justify-content:center;gap:8px;flex:1;padding:0 12px}
+.btn.coral{background:var(--coral);color:#fff;box-shadow:0 5px 0 var(--coral-deep)}
+.btn.teal{background:var(--teal);color:#fff;box-shadow:0 5px 0 var(--teal-deep)}
+.btn.soft{background:var(--foam);color:var(--foam-ink)}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn-row{display:flex;gap:10px}
+.link-btn{color:var(--teal);font-weight:800;font-size:14px;padding:10px 16px;align-self:center;text-decoration:none}
+
+/* card */
+.prog{display:flex;gap:3px}
+.prog i{flex:1;height:7px;border-radius:4px;background:var(--foam)}
+.prog i.ok{background:var(--teal)} .prog i.fix{background:var(--gold)} .prog i.miss{background:var(--coral)} .prog i.now{background:var(--ink)}
+.prompt{background:var(--card);border-radius:24px;padding:14px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 5px 0 var(--foam);position:relative}
+.prompt .ask{font-weight:800;font-size:14px;color:var(--ink-soft)}
+.prompt .py{font-family:var(--body);font-weight:800;font-size:34px;letter-spacing:1px;text-align:center;line-height:1.2}
+.prompt .han{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.badge{position:absolute;right:12px;top:10px;font-size:11px;font-weight:800;background:var(--sand);color:var(--sand-ink);border-radius:10px;padding:3px 8px}
+.say{border:0;cursor:pointer;width:44px;height:44px;border-radius:22px;background:var(--foam);display:flex;align-items:center;justify-content:center}
+.row{display:flex;align-items:center;gap:10px;justify-content:center}
+
+/* writing characters */
+.slots{display:flex;gap:6px;justify-content:center}
+.slot{width:46px;height:46px;border-radius:10px;border:2px dashed #B9CAD3;background:var(--card);box-sizing:border-box;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.slot.now{border:2px solid var(--teal)}
+.slot.done{border:2px solid var(--teal);background:#EAF7F5}
+.slot.fix{border:2px solid var(--gold);background:var(--sand)}
+.slot.shown{border:2px solid var(--coral);background:var(--coral-tint)}
+.slot.given{border:2px solid #DDE5EA;background:#F3F6F8}
+.pad-wrap{display:flex;justify-content:center}
+.pad{position:relative;background:var(--card);border-radius:18px;border:3px solid var(--grid);touch-action:none}
+.pad svg.gridlines{position:absolute;inset:0;pointer-events:none}
+.pad .w{position:relative}
+.fb{border-radius:18px;padding:11px 14px;font-size:15px;line-height:1.45}
+.fb.ok{background:#D7F0EC;color:var(--foam-ink)}
+.fb.no{background:var(--coral-tint);color:var(--coral-deep)}
+.fb.tip{background:var(--sand);color:var(--sand-ink)}
+.fb b{font-weight:800}
+.fb .ans{font-family:var(--han);font-size:20px}
+
+/* pinyin input */
+.syls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.syl{border:3px solid #B9CAD3;background:var(--card);border-radius:14px;min-width:64px;height:58px;padding:0 6px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.syl.now{border-color:var(--teal);box-shadow:0 0 0 4px var(--foam)}
+.syl.ok{border-color:var(--teal);background:var(--teal);color:#fff}
+.syl.bad{border-color:var(--coral);background:var(--coral-tint)}
+.syl.shown{border-color:var(--gold);background:var(--sand)}
+.syl .han1{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-family:var(--han);font-size:13px;background:var(--lagoon);border-radius:8px;padding:0 5px;color:var(--ink-soft)}
+.lt{border:0;background:transparent;padding:0 1px;font-family:var(--body);font-weight:800;font-size:30px;line-height:1;cursor:pointer;color:inherit;border-bottom:3px solid transparent}
+.lt.sel{border-bottom-color:var(--coral)}
+.syl.ok .lt.sel{border-bottom-color:transparent}
+.caret{display:inline-block;width:2px;height:28px;background:var(--teal);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.kb{display:flex;flex-direction:column;gap:6px;margin-top:auto}
+.kb .r{display:flex;gap:4px;justify-content:center}
+.kb button{border:0;cursor:pointer;height:44px;flex:1;max-width:38px;border-radius:9px;background:var(--card);box-shadow:0 3px 0 var(--foam);font-weight:800;font-size:19px;padding:0}
+.kb button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--foam)}
+.kb .tone{max-width:none;font-size:15px;background:var(--pearl);box-shadow:0 3px 0 #EDB9C8;color:var(--pearl-ink)}
+.kb .tone b{font-size:22px;display:block;line-height:.8}
+.kb .wide{max-width:none;font-size:14px}
+.kb .go{background:var(--teal);color:#fff;box-shadow:0 3px 0 var(--teal-deep)}
+.kb .del{background:var(--pearl);box-shadow:0 3px 0 #EDB9C8}
+
+/* results / lists */
+.res{align-items:center;text-align:center}
+.res h1{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;color:var(--teal);margin:0}
+.big{font-family:var(--display);font-weight:800;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.list{display:flex;flex-direction:column;gap:6px;width:100%}
+.li{background:var(--card);border-radius:14px;padding:9px 12px;display:flex;align-items:center;gap:10px;text-align:left}
+.li .w{font-family:var(--han);font-size:22px;min-width:70px}
+.li .p{flex:1;font-weight:700;color:var(--ink-soft)}
+.li .m{font-weight:800;font-size:13px;border-radius:10px;padding:3px 8px}
+.m.ok{background:#D7F0EC;color:var(--foam-ink)} .m.fix{background:var(--sand);color:var(--sand-ink)} .m.miss{background:var(--coral-tint);color:var(--coral-deep)}
+.dirtag{font-size:12px;font-weight:800;color:var(--ink-soft)}
+.lessons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.lessons .chip{min-height:58px;padding:6px 2px}
+.meter{width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.5);overflow:hidden}
+.chip:not(.on) .meter{background:#D4E6EA}
+.meter i{display:block;height:100%;background:var(--gold)}
+:focus-visible{outline:3px solid var(--lilac);outline-offset:3px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app" id="app" aria-live="polite"></main>
+<script src="hanzi-writer.min.js"></script>
+<script src="hanzi-data.js"></script>
+<script>
+(function(){
+/* ---------- word list: CHIJ OLGC P1 听写 1B L15–19 ---------- */
+/* test: 'py' = school asks for Hanyu Pinyin (看汉字写汉语拼音); 'hz' = school asks for characters (听写汉字); 'stroke' = 汉字笔画.
+   Characters in brackets are not tested when writing characters. Pinyin after | is also accepted. */
+const ITEMS = [{"id": "15p0", "l": 15, "w": "切", "py": "qiē", "test": "py"}, {"id": "15p1", "l": 15, "w": "最", "py": "zuì", "test": "py"}, {"id": "15p2", "l": 15, "w": "弯", "py": "wān", "test": "py"}, {"id": "15p3", "l": 15, "w": "臭", "py": "chòu", "test": "py"}, {"id": "15p4", "l": 15, "w": "重", "py": "zhòng", "test": "py"}, {"id": "15p5", "l": 15, "w": "选", "py": "xuǎn", "test": "py"}, {"id": "15p6", "l": 15, "w": "圆", "py": "yuán", "test": "py"}, {"id": "15p7", "l": 15, "w": "一串", "py": "yí chuàn", "test": "py"}, {"id": "15p8", "l": 15, "w": "怎么", "py": "zěn me", "test": "py"}, {"id": "15h0", "l": 15, "w": "它", "py": "tā", "test": "hz"}, {"id": "15h1", "l": 15, "w": "买", "py": "mǎi", "test": "hz"}, {"id": "15h2", "l": 15, "w": "看", "py": "kàn", "test": "hz"}, {"id": "15h3", "l": 15, "w": "学生", "py": "xué shēng|xué sheng", "test": "hz"}, {"id": "15h4", "l": 15, "w": "办法", "py": "bàn fǎ", "test": "hz"}, {"id": "15h5", "l": 15, "w": "果汁", "py": "guǒ zhī", "test": "hz"}, {"id": "15h6", "l": 15, "w": "一公斤", "py": "yì gōng jīn", "test": "hz"}, {"id": "16p0", "l": 16, "w": "写字", "py": "xiě zì", "test": "py"}, {"id": "16p1", "l": 16, "w": "扫地", "py": "sǎo dì", "test": "py"}, {"id": "16p2", "l": 16, "w": "桌椅", "py": "zhuō yǐ", "test": "py"}, {"id": "16p3", "l": 16, "w": "兄弟", "py": "xiōng dì", "test": "py"}, {"id": "16p4", "l": 16, "w": "叔叔", "py": "shū shu", "test": "py"}, {"id": "16p5", "l": 16, "w": "房间", "py": "fáng jiān", "test": "py"}, {"id": "16p6", "l": 16, "w": "作业", "py": "zuò yè", "test": "py"}, {"id": "16p7", "l": 16, "w": "躲进", "py": "duǒ jìn", "test": "py"}, {"id": "16p8", "l": 16, "w": "干净", "py": "gān jìng", "test": "py"}, {"id": "16p9", "l": 16, "w": "做完", "py": "zuò wán", "test": "py"}, {"id": "16p10", "l": 16, "w": "笑声", "py": "xiào shēng", "test": "py"}, {"id": "16h0", "l": 16, "w": "父母", "py": "fù mǔ", "test": "hz"}, {"id": "16h1", "l": 16, "w": "你们", "py": "nǐ men", "test": "hz"}, {"id": "16h2", "l": 16, "w": "爸爸", "py": "bà ba", "test": "hz"}, {"id": "16h3", "l": 16, "w": "妈妈", "py": "mā ma", "test": "hz"}, {"id": "16h4", "l": 16, "w": "打(扫)", "py": "dǎ sǎo", "test": "hz"}, {"id": "16h5", "l": 16, "w": "会不会", "py": "huì bu huì|huì bú huì", "test": "hz"}, {"id": "17p0", "l": 17, "w": "星星", "py": "xīng xīng", "test": "py"}, {"id": "17p1", "l": 17, "w": "庆祝", "py": "qìng zhù", "test": "py"}, {"id": "17p2", "l": 17, "w": "因为", "py": "yīn wèi", "test": "py"}, {"id": "17p3", "l": 17, "w": "爱国", "py": "ài guó", "test": "py"}, {"id": "17p4", "l": 17, "w": "上课", "py": "shàng kè", "test": "py"}, {"id": "17p5", "l": 17, "w": "讲故事", "py": "jiǎng gù shi", "test": "py"}, {"id": "17p6", "l": 17, "w": "儿童节", "py": "ér tóng jié", "test": "py"}, {"id": "17h0", "l": 17, "w": "给", "py": "gěi", "test": "hz"}, {"id": "17h1", "l": 17, "w": "快乐", "py": "kuài lè", "test": "hz"}, {"id": "17h2", "l": 17, "w": "明天", "py": "míng tiān", "test": "hz"}, {"id": "17h3", "l": 17, "w": "昨(晚)", "py": "zuó wǎn", "test": "hz"}, {"id": "17h4", "l": 17, "w": "没有", "py": "méi yǒu", "test": "hz"}, {"id": "17h5", "l": 17, "w": "这里", "py": "zhè lǐ|zhè li", "test": "hz"}, {"id": "17h6", "l": 17, "w": "老师", "py": "lǎo shī", "test": "hz"}, {"id": "17h7", "l": 17, "w": "每个", "py": "měi gè|měi ge", "test": "hz"}, {"id": "17s0", "l": 17, "w": "横折弯", "py": "héng zhé wān", "test": "stroke", "ex": "朵", "k": 1}, {"id": "18p0", "l": 18, "w": "带", "py": "dài", "test": "py"}, {"id": "18p1", "l": 18, "w": "黑", "py": "hēi", "test": "py"}, {"id": "18p2", "l": 18, "w": "短", "py": "duǎn", "test": "py"}, {"id": "18p3", "l": 18, "w": "眼睛", "py": "yǎn jing", "test": "py"}, {"id": "18p4", "l": 18, "w": "尾巴", "py": "wěi ba", "test": "py"}, {"id": "18p5", "l": 18, "w": "认字", "py": "rèn zì", "test": "py"}, {"id": "18p6", "l": 18, "w": "孩子", "py": "hái zi", "test": "py"}, {"id": "18p7", "l": 18, "w": "星期", "py": "xīng qī", "test": "py"}, {"id": "18p8", "l": 18, "w": "说话", "py": "shuō huà", "test": "py"}, {"id": "18p9", "l": 18, "w": "动物园", "py": "dòng wù yuán", "test": "py"}, {"id": "18h0", "l": 18, "w": "叫", "py": "jiào", "test": "hz"}, {"id": "18h1", "l": 18, "w": "玩", "py": "wán", "test": "hz"}, {"id": "18h2", "l": 18, "w": "我", "py": "wǒ", "test": "hz"}, {"id": "18h3", "l": 18, "w": "力气", "py": "lì qi|lì qì", "test": "hz"}, {"id": "18h4", "l": 18, "w": "弟弟", "py": "dì di", "test": "hz"}, {"id": "18h5", "l": 18, "w": "再来", "py": "zài lái", "test": "hz"}, {"id": "18h6", "l": 18, "w": "爪子尖", "py": "zhuǎ zi jiān", "test": "hz"}, {"id": "18h7", "l": 18, "w": "站(起)来", "py": "zhàn qǐ lái|zhàn qi lai|zhàn qi lái", "test": "hz"}, {"id": "18s0", "l": 18, "w": "横折斜钩", "py": "héng zhé xié gōu", "test": "stroke", "ex": "风", "k": 1}, {"id": "18s1", "l": 18, "w": "斜钩", "py": "xié gōu", "test": "stroke", "ex": "我", "k": 4}, {"id": "19p0", "l": 19, "w": "组屋", "py": "zǔ wū", "test": "py"}, {"id": "19p1", "l": 19, "w": "电梯", "py": "diàn tī", "test": "py"}, {"id": "19p2", "l": 19, "w": "伙伴", "py": "huǒ bàn", "test": "py"}, {"id": "19p3", "l": 19, "w": "游戏", "py": "yóu xì", "test": "py"}, {"id": "19p4", "l": 19, "w": "跑步", "py": "pǎo bù", "test": "py"}, {"id": "19p5", "l": 19, "w": "拍球", "py": "pāi qiú", "test": "py"}, {"id": "19p6", "l": 19, "w": "商店", "py": "shāng diàn", "test": "py"}, {"id": "19p7", "l": 19, "w": "常常", "py": "cháng cháng", "test": "py"}, {"id": "19h0", "l": 19, "w": "到", "py": "dào", "test": "hz"}, {"id": "19h1", "l": 19, "w": "公园", "py": "gōng yuán", "test": "hz"}, {"id": "19h2", "l": 19, "w": "姐姐", "py": "jiě jie", "test": "hz"}, {"id": "19h3", "l": 19, "w": "高兴", "py": "gāo xìng", "test": "hz"}, {"id": "19h4", "l": 19, "w": "学习", "py": "xué xí", "test": "hz"}, {"id": "19h5", "l": 19, "w": "一起", "py": "yì qǐ", "test": "hz"}, {"id": "19h6", "l": 19, "w": "哥哥", "py": "gē ge", "test": "hz"}, {"id": "19h7", "l": 19, "w": "开心", "py": "kāi xīn", "test": "hz"}, {"id": "19s0", "l": 19, "w": "卧钩", "py": "wò gōu", "test": "stroke", "ex": "心", "k": 1}];
+const LESSON_NAME = {15:'十五',16:'十六',17:'十七',18:'十八',19:'十九'};
+const KEY = 'pearl-tingxie-v1';
+const PRAISE = ['Shell yes!','Fin-tastic!','Pearl-fect!','Splash-tastic!','好棒!','Whale done!'];
+
+/* ---------- data ---------- */
+function fresh(){ return {lessons:[19], paper:false, outline:false, stats:{}, days:{}}; }
+let D = fresh();
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && typeof s === 'object') D = Object.assign(fresh(), s); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(D)); } catch(e){} }
+const $ = id => document.getElementById(id);
+const rint = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const shuffle = a => { a = a.slice(); for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function dayKey(d){ d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+const byId = {}; ITEMS.forEach(it => byId[it.id] = it);
+function chars(it){ const out = []; let br = false; for (const ch of it.w){ if (ch === '(') br = true; else if (ch === ')') br = false; else out.push({ch, given:br}); } return out; }
+function plain(it){ return it.w.replace(/[()]/g, ''); }
+function pyMain(it){ return it.py.split('|')[0]; }
+function stat(k){ return D.stats[k] || (D.stats[k] = {seen:0, right:0, wrong:0, streak:0, tricky:false, catchDays:[], last:0}); }
+const sk = (it, dir) => it.id + '|' + dir;
+
+/* ---------- pinyin ---------- */
+const TONED = {a:'āáǎà', e:'ēéěè', i:'īíǐì', o:'ōóǒò', u:'ūúǔù', 'ü':'ǖǘǚǜ'};
+const UNTONE = {}; Object.entries(TONED).forEach(([b, s]) => [...s].forEach((c, i) => UNTONE[c] = [b, i + 1]));
+function parseSyl(s){ let base = '', tone = 0, at = -1; [...s].forEach((c, i) => { if (UNTONE[c]){ base += UNTONE[c][0]; tone = UNTONE[c][1]; at = i; } else base += c; }); return {base, tone, at}; }
+function toned(ch, t){ return t && TONED[ch] ? TONED[ch][t - 1] : ch; }
+function sylText(s){ return s.letters.map((c, i) => i === s.at ? toned(c, s.tone) : c).join(''); }
+function markVowel(base){ /* where the tone mark goes: a/e first, then o in ou, else last vowel */
+  if (base.includes('a')) return 'a'; if (base.includes('e')) return 'e'; if (base.includes('ou')) return 'o';
+  const v = [...base].filter(c => 'iouü'.includes(c)); return v.length ? v[v.length - 1] : '';
+}
+
+/* ---------- speech ---------- */
+let zhVoice = null;
+function pickVoice(){ try { const vs = speechSynthesis.getVoices(); zhVoice = vs.find(v => /zh[-_]CN/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null; } catch(e){} }
+try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch(e){}
+function say(text){
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'zh-CN'; if (zhVoice) u.voice = zhVoice; u.rate = 0.7; speechSynthesis.speak(u); } catch(e){}
+}
+
+/* ---------- icons ---------- */
+const I = {
+  back:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  close:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  speaker:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A5660" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>',
+  del:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8C2F5A" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h11v14H9l-6-7z"/><path d="M12 9l5 6M17 9l-5 6"/></svg>',
+  pearl:(s=70) => `<svg width="${s}" height="${s*0.8}" viewBox="0 0 100 80" aria-hidden="true"><path d="M10 52c0-26 18-44 40-44s40 18 40 44z" fill="#F7D6E0"/><path d="M50 8v44M30 13l10 39M70 13l-10 39M16 28l22 24M84 28l-22 24" stroke="#E58FB0" stroke-width="3"/><path d="M6 52h88c0 12-20 22-44 22S6 64 6 52z" fill="#E58FB0"/><circle cx="50" cy="50" r="13" fill="#FFFFFF" stroke="#E3EEF2" stroke-width="2"/><circle cx="45" cy="45" r="4" fill="#F4F8F9"/></svg>`
+};
+
+/* ---------- static kaishu characters ---------- */
+const loader = (ch, onLoad, onError) => window.HZDATA && HZDATA[ch] ? onLoad(HZDATA[ch]) : onError && onError();
+function staticChar(el, ch, size, color){
+  if (!window.HanziWriter || !HZDATA[ch]){ el.innerHTML = `<span style="font-family:var(--han);font-size:${Math.round(size*0.8)}px;line-height:${size}px;color:${color}">${esc(ch)}</span>`; return; }
+  HanziWriter.create(el, ch, {width:size, height:size, padding:Math.round(size*0.06), showOutline:false, strokeColor:color, charDataLoader:loader, renderer:'svg'});
+}
+function fillStatics(){
+  document.querySelectorAll('[data-han]').forEach(el => {
+    if (el.dataset.done) return; el.dataset.done = '1';
+    staticChar(el, el.dataset.han, +el.dataset.size || 60, el.dataset.color || '#123B57');
+  });
+}
+const hanSpan = (ch, size, color) => `<span data-han="${esc(ch)}" data-size="${size}" data-color="${color || '#123B57'}" style="display:inline-block;width:${size}px;height:${size}px"></span>`;
+
+/* ---------- session building ---------- */
+let screen = 'home', SES = null, C = null, writer = null;
+function inLessons(){ return ITEMS.filter(it => D.lessons.includes(it.l)); }
+function trickyCards(lessons){
+  const out = [];
+  ITEMS.filter(it => !lessons || lessons.includes(it.l)).forEach(it => dirsOf(it).forEach(dir => { const s = D.stats[sk(it, dir)]; if (s && s.tricky) out.push({it, dir, s}); }));
+  return out.sort((a, b) => b.s.last - a.s.last);
+}
+function dirsOf(it){ return it.test === 'stroke' ? ['stroke'] : ['hz', 'py']; }
+function buildPractice(){
+  const pool = []; inLessons().forEach(it => dirsOf(it).forEach(dir => pool.push({it, dir})));
+  const tricky = shuffle(pool.filter(c => D.stats[sk(c.it, c.dir)]?.tricky)).slice(0, 5);
+  const unseen = shuffle(pool.filter(c => !D.stats[sk(c.it, c.dir)]));
+  const rest = shuffle(pool.filter(c => D.stats[sk(c.it, c.dir)] && !D.stats[sk(c.it, c.dir)].tricky));
+  const pick = []; const seen = new Set();
+  [...tricky, ...unseen, ...rest].forEach(c => { if (pick.length < 12 && !seen.has(sk(c.it, c.dir))){ seen.add(sk(c.it, c.dir)); pick.push(c); } });
+  return spread(shuffle(pick));
+}
+function spread(cards){ /* avoid the same word twice in a row */
+  for (let i = 1; i < cards.length; i++) if (cards[i].it.id === cards[i-1].it.id){ const j = cards.findIndex((c, k) => k > i && c.it.id !== cards[i-1].it.id); if (j > 0) [cards[i], cards[j]] = [cards[j], cards[i]]; }
+  return cards;
+}
+function startSession(kind, cards, title){
+  SES = {kind, title, cards, i:0, res:[]};
+  openCard();
+}
+function startMock(l){
+  const cards = ITEMS.filter(it => it.l === l).map(it => ({it, dir: it.test === 'stroke' ? 'stroke' : it.test}));
+  startSession('mock', cards, '听写（' + LESSON_NAME[l] + '）');
+}
+
+/* ---------- card ---------- */
+function openCard(){
+  const c = SES.cards[SES.i];
+  C = {it:c.it, dir:c.dir, tries:0, status:'todo', shownAny:false, mistakes:0};
+  if (c.dir === 'hz'){ C.chars = chars(c.it); C.ci = C.chars.findIndex(x => !x.given); C.cstat = C.chars.map(x => x.given ? 'given' : ''); C.paperStage = 'write'; }
+  if (c.dir === 'py'){ C.exp = c.it.py.split('|').map(a => a.split(' ').map(parseSyl)); C.ans = C.exp[0].map(() => ({letters:[], tone:0, at:-1})); C.s = 0; C.sel = -1; C.bad = []; }
+  go('card');
+  if (c.dir === 'hz') setTimeout(() => say(plain(c.it)), 250);
+  if (c.dir === 'stroke') setTimeout(() => say(c.it.w), 250);
+}
+function header(){
+  const n = SES.cards.length;
+  const prog = SES.cards.map((_, k) => `<i class="${k < SES.res.length ? SES.res[k].mark : k === SES.i ? 'now' : ''}"></i>`).join('');
+  return `<div class="top"><button class="icon-btn" data-act="quit" aria-label="Stop">${I.close}</button><h1>${esc(SES.title)}</h1><span class="pill">${SES.i + 1} / ${n}</span></div><div class="prog" aria-hidden="true">${prog}</div>`;
+}
+function cardView(){
+  const it = C.it, onTest = (C.dir === it.test) || C.dir === 'stroke';
+  const badge = onTest ? `<span class="badge">On the test</span>` : '';
+  let prompt, body;
+  if (C.dir === 'hz'){
+    prompt = `<div class="prompt">${badge}<span class="ask">Listen and write the word</span><div class="row"><span class="py">${esc(pyMain(it))}</span><button class="say" data-act="say" aria-label="Say it again">${I.speaker}</button></div></div>`;
+    const slots = `<div class="slots">${C.chars.map((x, k) => `<span class="slot ${x.given ? 'given' : C.cstat[k] || (k === C.ci && C.status === 'todo' ? 'now' : '')}" id="slot${k}">${x.given || C.cstat[k] || C.status !== 'todo' ? hanSpan(x.ch, 40, x.given ? '#9DB0BC' : '#123B57') : ''}</span>`).join('')}</div>`;
+    const note = C.chars.some(x => x.given) ? `<p class="muted" style="text-align:center">The grey ${C.chars.filter(x => x.given).length > 1 ? 'characters are' : 'character is'} not tested.</p>` : '';
+    if (D.paper && C.status === 'todo'){
+      body = slots + note + (C.paperStage === 'write'
+        ? `<div class="card" style="align-items:center;text-align:center"><h2>Write it on paper</h2><p class="muted">When you’re done, check it here.</p></div><div class="btn-row" style="margin-top:auto"><button class="btn teal" data-act="paperShow">Check my writing</button></div>`
+        : `<div class="card" style="align-items:center"><div class="row" id="reveal"></div><p class="muted">Tap a character to see its strokes again.</p></div><div class="btn-row" style="margin-top:auto"><button class="btn" data-act="paperMark" data-arg="miss">I made a mistake</button><button class="btn teal" data-act="paperMark" data-arg="ok">I got it right</button></div>`);
+    } else if (C.status === 'todo'){
+      body = slots + note + `<div class="pad-wrap"><div class="pad" id="pad"></div></div>
+        <div class="btn-row"><button class="btn" data-act="hint">Hint</button><button class="btn soft" data-act="showme">Show me</button></div>`;
+    } else body = slots + note + resultBlock();
+  } else if (C.dir === 'py'){
+    prompt = `<div class="prompt">${badge}<span class="ask">Write the Hanyu Pinyin</span><div class="han">${chars(it).map(x => hanSpan(x.ch, 64)).join('')}</div></div>`;
+    const syls = `<div class="syls">${C.ans.map((s, k) => {
+      let cls = k === C.s && C.status === 'todo' ? 'now' : '';
+      if (C.status !== 'todo') cls = C.status === 'shown' ? 'shown' : 'ok'; else if (C.bad.includes(k)) cls += ' bad';
+      const letters = s.letters.map((ch, i) => `<button class="lt ${C.status === 'todo' && k === C.s && i === C.sel ? 'sel' : ''}" data-act="pick" data-arg="${k},${i}" aria-label="${esc(ch)}">${i === s.at ? toned(ch, s.tone) : ch}</button>`).join('');
+      return `<div class="syl ${cls}" data-act="sylbox" data-arg="${k}"><span class="han1">${esc(chars(it)[k].ch)}</span>${letters}${C.status === 'todo' && k === C.s ? '<span class="caret"></span>' : ''}</div>`;
+    }).join('')}</div>`;
+    body = syls + (C.status === 'todo' ? (C.msg ? `<div class="fb ${C.msgOk ? 'tip' : 'no'}">${C.msg}</div>` : '<p class="muted" style="text-align:center">Type the letters, then tap a letter and a tone to put the tone mark on it.</p>') + (C.tries >= 1 ? `<button class="btn soft" data-act="showme" style="flex:none;min-height:44px">Show me</button>` : '') + keyboard() : resultBlock());
+  } else {
+    prompt = `<div class="prompt">${badge}<span class="ask">Write this stroke</span><div class="row"><span class="py" style="font-family:var(--han);font-size:34px">${esc(it.w)}</span><button class="say" data-act="say" aria-label="Say it again">${I.speaker}</button></div><span class="muted">${esc(it.py)}</span></div>`;
+    body = C.status === 'todo'
+      ? `<p class="muted" style="text-align:center">Draw the missing stroke in <b style="font-family:var(--han);font-size:18px">${esc(it.ex)}</b>.</p><div class="pad-wrap"><div class="pad" id="pad"></div></div><div class="btn-row"><button class="btn" data-act="hint">Hint</button><button class="btn soft" data-act="showme">Show me</button></div>`
+      : resultBlock();
+  }
+  return header() + prompt + body;
+}
+function resultBlock(){
+  const it = C.it, ok = C.status === 'right', fix = C.status === 'fixed';
+  let line = '';
+  if (C.dir === 'hz') line = `<span class="ans">${esc(plain(it))}</span> · ${esc(pyMain(it))}`;
+  else if (C.dir === 'py') line = `<span class="ans">${esc(plain(it))}</span> · <b>${esc(pyMain(it))}</b>${it.py.includes('|') ? ` <span style="font-size:13px">(also OK: ${esc(it.py.split('|').slice(1).join(', '))})</span>` : ''}`;
+  else line = `<span class="ans">${esc(it.w)}</span> · ${esc(it.py)}`;
+  const head = ok ? `<b>${PRAISE[SES.i % PRAISE.length]}</b> ` : fix ? `<b>You fixed it!</b> ` : `<b>Let’s learn this one.</b> `;
+  const last = SES.i === SES.cards.length - 1;
+  return `<div class="fb ${ok || fix ? 'ok' : 'tip'}">${head}${line}</div>
+    <div class="btn-row" style="margin-top:auto">${C.dir !== 'stroke' ? `<button class="btn" data-act="say">${I.speaker} Hear it</button>` : ''}<button class="btn coral" data-act="next">${last ? 'See my pearls' : 'Next'}</button></div>`;
+}
+function keyboard(){
+  const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnmü'];
+  const tones = [[1,'ˉ','1st'],[2,'ˊ','2nd'],[3,'ˇ','3rd'],[4,'ˋ','4th']];
+  return `<div class="kb" role="group" aria-label="Pinyin keyboard">
+    <div class="r">${tones.map(([t, m, n]) => `<button class="tone" data-act="tone" data-arg="${t}" aria-label="${n} tone"><b>${m}</b>${n}</button>`).join('')}<button class="tone" data-act="tone" data-arg="0" aria-label="No tone mark">no mark</button></div>
+    ${rows.map((r, k) => `<div class="r">${[...r].map(ch => `<button data-act="letter" data-arg="${ch}">${ch}</button>`).join('')}${k === 2 ? `<button class="del" data-act="bk" aria-label="Delete">${I.del}</button>` : ''}</div>`).join('')}
+    <div class="r"><button class="wide" data-act="nextsyl" style="flex:1.2">Next syllable ▸</button><button class="wide go" data-act="check" style="flex:1">Check</button></div>
+  </div>`;
+}
+
+/* ---------- writer (characters and strokes) ---------- */
+function padSize(){ return Math.min(280, window.innerWidth - 80); }
+function gridSvg(n){ return `<svg class="gridlines" width="${n}" height="${n}" aria-hidden="true"><g stroke="#E7B9C8" stroke-width="1.5" stroke-dasharray="6 6"><line x1="0" y1="${n/2}" x2="${n}" y2="${n/2}"/><line x1="${n/2}" y1="0" x2="${n/2}" y2="${n}"/><line x1="0" y1="0" x2="${n}" y2="${n}"/><line x1="${n}" y1="0" x2="0" y2="${n}"/></g></svg>`; }
+function mountWriter(){
+  const pad = $('pad'); if (!pad || !window.HanziWriter) return;
+  const n = padSize(); pad.style.width = n + 'px'; pad.style.height = n + 'px';
+  pad.innerHTML = gridSvg(n) + '<div class="w" id="w"></div>';
+  const ch = C.dir === 'stroke' ? C.it.ex : C.chars[C.ci].ch;
+  writer = HanziWriter.create('w', ch, {width:n, height:n, padding:14, showCharacter:false, showOutline: C.dir === 'stroke' ? true : D.outline, outlineColor:'#E3EAEE',
+    strokeColor:'#123B57', highlightColor:'#2FA3A8', drawingColor:'#0E7480', drawingWidth:7, showHintAfterMisses:3, highlightOnComplete:true,
+    leniency:1.3, charDataLoader:loader, renderer:'svg'});
+  C.charMistakes = 0;
+  if (C.dir === 'stroke'){
+    const k = C.it.k;
+    writer.quiz({quizStartStrokeNum:k, onMistake: () => { C.mistakes++; }, onCorrectStroke: d => { if (d.strokeNum === k){ writer.cancelQuiz(); writer.showCharacter(); finishCard(C.mistakes <= 2 ? 'right' : 'fixed'); } }});
+  } else {
+    writer.quiz({onMistake: () => { C.charMistakes++; C.mistakes++; }, onComplete: s => { charDone(C.charMistakes <= 2 ? 'done' : 'fix'); }});
+  }
+}
+function charDone(how){
+  C.cstat[C.ci] = how;
+  const next = C.chars.findIndex((x, k) => k > C.ci && !x.given);
+  if (next >= 0){ C.ci = next; setTimeout(() => { render(); mountWriter(); }, 350); return; }
+  const anyShown = C.cstat.includes('shown'), anyFix = C.cstat.includes('fix');
+  setTimeout(() => finishCard(anyShown ? 'shown' : anyFix ? 'fixed' : 'right'), 350);
+}
+function showMe(){
+  if (C.dir === 'py'){
+    C.ans = C.exp[0].map(e => ({letters:[...e.base], tone:e.tone, at:e.at}));
+    finishCard('shown'); return;
+  }
+  if (!writer) return;
+  writer.cancelQuiz();
+  if (C.dir === 'stroke'){ writer.hideCharacter(); writer.animateCharacter({onComplete: () => finishCard('shown')}); return; }
+  writer.animateCharacter({onComplete: () => { C.cstat[C.ci] = 'shown'; const next = C.chars.findIndex((x, k) => k > C.ci && !x.given);
+    if (next >= 0){ C.ci = next; render(); mountWriter(); } else finishCard('shown'); }});
+}
+function hint(){
+  if (!writer) return;
+  C.mistakes++; C.charMistakes = (C.charMistakes || 0) + 1;
+  if (C.dir === 'stroke'){ writer.highlightStroke(C.it.k); return; }
+  /* briefly show the outline, then hide it again */
+  writer.showOutline();
+  setTimeout(() => { if (writer && !D.outline && C.dir !== 'stroke') writer.hideOutline(); }, 1500);
+}
+
+/* ---------- pinyin typing ---------- */
+const VOWELS = 'aeiouü';
+function pyKey(act, arg){
+  if (C.status !== 'todo') return;
+  const s = C.ans[C.s];
+  C.msg = ''; C.bad = C.bad.filter(k => k !== C.s);
+  if (act === 'letter'){
+    if (s.letters.length >= 6) return;
+    s.letters.push(arg); C.sel = s.letters.length - 1;
+  } else if (act === 'bk'){
+    if (!s.letters.length){ if (C.s > 0){ C.s--; C.sel = C.ans[C.s].letters.length - 1; } }
+    else { const gone = s.letters.length - 1; s.letters.pop(); if (s.at === gone){ s.at = -1; s.tone = 0; } C.sel = s.letters.length - 1; }
+  } else if (act === 'tone'){
+    const t = +arg;
+    if (t === 0){ s.tone = 0; s.at = -1; }
+    else {
+      const i = C.sel >= 0 && C.sel < s.letters.length ? C.sel : -1;
+      if (i < 0 || !VOWELS.includes(s.letters[i])){
+        const mv = markVowel(s.letters.join(''));
+        C.msg = `<b>Tap the letter that gets the mark first.</b> Tone marks sit on a vowel: a, o, e, i, u or ü.${mv ? '' : ''}`; C.msgOk = true;
+      } else { s.tone = t; s.at = i; }
+    }
+  } else if (act === 'nextsyl'){
+    if (C.s < C.ans.length - 1){ C.s++; C.sel = C.ans[C.s].letters.length - 1; }
+  }
+  render();
+}
+function checkPy(){
+  if (C.ans.some(s => !s.letters.length)){ C.tries = Math.max(C.tries, 1); C.msg = '<b>Fill in every syllable first.</b> Tap a box to move to it, or tap Show me.'; C.msgOk = true; render(); return; }
+  /* compare with each accepted spelling and keep the closest */
+  let best = null;
+  C.exp.forEach(exp => {
+    const res = exp.map((e, k) => {
+      const a = C.ans[k], letters = a.letters.join('');
+      if (letters !== e.base) return 'letters';
+      if (a.tone !== e.tone) return 'tone';
+      if (e.tone && a.at !== e.at) return 'place';
+      return 'ok';
+    });
+    const bad = res.filter(r => r !== 'ok').length;
+    if (!best || bad < best.bad) best = {res, bad, exp};
+  });
+  C.tries++;
+  if (!best.bad){ finishCard(C.tries === 1 ? 'right' : 'fixed'); return; }
+  C.bad = best.res.map((r, k) => r === 'ok' ? -1 : k).filter(k => k >= 0);
+  const k = C.bad[0], r = best.res[k], e = best.exp[k], ch = chars(C.it)[k].ch;
+  C.s = k; C.sel = C.ans[k].letters.length - 1;
+  C.msg = r === 'letters' ? `<b>Look at the letters for <span style="font-family:var(--han)">${esc(ch)}</span>.</b> Say it slowly and listen for each sound.`
+        : r === 'tone' ? (e.tone === 0 ? `<b><span style="font-family:var(--han)">${esc(ch)}</span> is said lightly.</b> It has no tone mark.` : `<b>Letters are right for <span style="font-family:var(--han)">${esc(ch)}</span>!</b> Check the tone: is it ˉ ˊ ˇ or ˋ?`)
+        : `<b>Right tone for <span style="font-family:var(--han)">${esc(ch)}</span>!</b> But the mark goes on the <b>${esc(markVowel(e.base))}</b>.`;
+  C.msgOk = false;
+  render();
+}
+
+/* ---------- finishing ---------- */
+function finishCard(status){
+  if (C.status !== 'todo') return;
+  C.status = status;
+  const it = C.it, k = sk(it, C.dir), s = stat(k), today = dayKey();
+  s.seen++; s.last = Date.now();
+  if (status === 'right'){
+    s.right++; s.streak++;
+    if (s.tricky){ if (!s.catchDays.includes(today)) s.catchDays.push(today); if (s.streak >= 2 && s.catchDays.length >= 2){ s.tricky = false; s.catchDays = []; } }
+  } else { s.wrong++; s.streak = 0; s.tricky = true; s.catchDays = []; }
+  const r = D.days[today] || (D.days[today] = {cards:0}); r.cards++;
+  SES.res.push({it, dir:C.dir, mark: status === 'right' ? 'ok' : status === 'fixed' ? 'fix' : 'miss'});
+  save();
+  writer = null;
+  render();
+  if (C.dir === 'hz' || C.dir === 'py') setTimeout(() => say(plain(it)), 200);
+}
+function nextCard(){
+  if (SES.i < SES.cards.length - 1){ SES.i++; openCard(); }
+  else go('results');
+}
+
+/* ---------- home ---------- */
+function lessonMastery(l){
+  const cs = []; ITEMS.filter(it => it.l === l).forEach(it => dirsOf(it).forEach(d => cs.push(D.stats[sk(it, d)])));
+  return cs.filter(s => s && !s.tricky && s.streak >= 1).length / cs.length;
+}
+function homeView(){
+  const tr = trickyCards().length, mockL = D.mockL || D.lessons[D.lessons.length - 1] || 19;
+  const words = inLessons().filter(it => it.test !== 'stroke').length;
+  return `
+  <div class="brand">${I.pearl(84)}<h1>Pearl Tingxie</h1><span class="zh">珍珠听写</span><p>Every word, both ways</p></div>
+  <div class="card">
+    <span class="label">Lessons to practise</span>
+    <div class="lessons">${[15,16,17,18,19].map(l => `<button class="chip ${D.lessons.includes(l) ? 'on' : ''}" data-act="lesson" data-arg="${l}" aria-pressed="${D.lessons.includes(l)}"><span style="font-family:var(--han);font-size:15px">${LESSON_NAME[l]}</span><span class="meter"><i style="width:${Math.round(100 * lessonMastery(l))}%"></i></span></button>`).join('')}</div>
+    <p class="muted" style="font-size:13px">${words} words picked. The gold bar fills as she gets each word right both ways.</p>
+  </div>
+  <button class="menu teal" data-act="practice" ${D.lessons.length ? '' : 'disabled'}><span class="ico">练</span><span class="txt"><span class="name">Practice both ways</span><span class="desc">12 cards · write the word and write the pinyin</span></span></button>
+  <div class="card">
+    <h2>Mock 听写</h2>
+    <p class="muted">Just like the test: pinyin for section 一, characters for section 二, and the strokes.</p>
+    <div class="chips">${[15,16,17,18,19].map(l => `<button class="chip ${mockL === l ? 'on' : ''}" data-act="mockl" data-arg="${l}"><span style="font-family:var(--han)">${LESSON_NAME[l]}</span></button>`).join('')}</div>
+    <button class="btn coral" data-act="mock" data-arg="${mockL}" style="flex:none">Start 听写（${LESSON_NAME[mockL]}）</button>
+  </div>
+  <button class="menu pink" data-act="go" data-arg="tricky"><span class="ico">难</span><span class="txt"><span class="name">Tricky words</span><span class="desc">${tr ? tr + ' to practise again' : 'None right now'}</span></span></button>
+  <div class="card">
+    <h2>Writing characters</h2>
+    <div class="seg" role="group" aria-label="Where to write"><button class="${!D.paper ? 'on' : ''}" data-act="paper" data-arg="0">On the screen</button><button class="${D.paper ? 'on' : ''}" data-act="paper" data-arg="1">On paper</button></div>
+    ${!D.paper ? `<div class="seg" role="group" aria-label="Outline"><button class="${!D.outline ? 'on' : ''}" data-act="outline" data-arg="0">Blank box</button><button class="${D.outline ? 'on' : ''}" data-act="outline" data-arg="1">Faint outline</button></div>` : ''}
+    <p class="muted" style="font-size:13px">${D.paper ? 'She writes in her book, then checks against the animated strokes and marks herself.' : 'She writes with her finger, stroke by stroke. Wrong order or direction is caught as she goes.'}</p>
+  </div>
+  <a class="link-btn" href="./">Mermaid Times</a>`;
+}
+function trickyView(){
+  const list = trickyCards();
+  return `<div class="top"><button class="icon-btn" data-act="go" data-arg="home" aria-label="Back">${I.back}</button><h1>Tricky words</h1><span style="width:44px"></span></div>
+  <p class="muted">A word is set free after she gets it right 2 times in a row, on 2 different days.</p>
+  ${list.length ? `<div class="list">${list.map(c => `<div class="li"><span class="w">${esc(plain(c.it))}</span><span class="p">${esc(pyMain(c.it))}<br><span class="dirtag">${c.dir === 'hz' ? 'Writing the word' : c.dir === 'py' ? 'Writing the pinyin' : 'Stroke'} · 听写（${LESSON_NAME[c.it.l]}）</span></span></div>`).join('')}</div>
+  <button class="btn coral" data-act="trickygo" style="flex:none;margin-top:auto">Practise these now</button>` : `<div class="card" style="align-items:center;text-align:center">${I.pearl(70)}<h2>No tricky words!</h2><p class="muted">Words she gets wrong, or needs help with, will show up here.</p></div>`}`;
+}
+function resultsView(){
+  const r = SES.res, ok = r.filter(x => x.mark === 'ok').length, n = r.length;
+  const mock = SES.kind === 'mock';
+  return `<div class="app res" style="padding:8px 0 0;flex:1;gap:12px">
+    ${I.pearl(96)}
+    <h1>${mock ? SES.title + ' done!' : ok === n ? 'Pearl-fect!' : 'Lovely work!'}</h1>
+    <div class="big">${ok} / ${n}</div>
+    <p class="muted">${mock ? 'right first time, like the real test' : 'right first time'}</p>
+    <div class="list">${r.map(x => `<div class="li"><span class="w">${esc(x.dir === 'stroke' ? x.it.w : plain(x.it))}</span><span class="p">${esc(x.dir === 'stroke' ? x.it.py : pyMain(x.it))}<br><span class="dirtag">${x.dir === 'hz' ? 'wrote the word' : x.dir === 'py' ? 'wrote the pinyin' : 'stroke'}</span></span><span class="m ${x.mark}">${x.mark === 'ok' ? 'Right' : x.mark === 'fix' ? 'Fixed' : 'Learning'}</span></div>`).join('')}</div>
+    <div class="btn-row" style="width:100%;margin-top:auto">
+      <button class="btn" data-act="go" data-arg="home">Home</button>
+      ${r.some(x => x.mark !== 'ok') ? `<button class="btn coral" data-act="redo" style="flex:1.4">Try the misses again</button>` : `<button class="btn coral" data-act="${mock ? 'mock' : 'practice'}" data-arg="${mock ? D.mockL || 19 : ''}" style="flex:1.4">Again</button>`}
+    </div>
+  </div>`;
+}
+
+/* ---------- render ---------- */
+const VIEWS = {home:homeView, card:cardView, tricky:trickyView, results:resultsView};
+function render(){ $('app').innerHTML = VIEWS[screen](); fillStatics(); }
+function go(s){ const c = s !== screen; screen = s; render(); if (c) window.scrollTo(0, 0); if (s === 'card' && C && C.status === 'todo' && (C.dir === 'stroke' || (C.dir === 'hz' && !D.paper))) mountWriter(); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]'); if (!t || t.disabled) return;
+  const a = t.dataset.act, arg = t.dataset.arg;
+  switch (a){
+    case 'go': go(arg); break;
+    case 'lesson': { const l = +arg; D.lessons = D.lessons.includes(l) ? D.lessons.filter(x => x !== l) : D.lessons.concat(l).sort(); save(); render(); break; }
+    case 'mockl': D.mockL = +arg; save(); render(); break;
+    case 'paper': D.paper = arg === '1'; save(); render(); break;
+    case 'outline': D.outline = arg === '1'; save(); render(); break;
+    case 'practice': if (D.lessons.length) startSession('practice', buildPractice(), 'Practice'); break;
+    case 'mock': D.mockL = +arg || D.mockL || 19; save(); startMock(D.mockL); break;
+    case 'trickygo': startSession('practice', spread(shuffle(trickyCards().map(c => ({it:c.it, dir:c.dir})))).slice(0, 12), 'Tricky words'); break;
+    case 'redo': startSession('practice', SES.res.filter(x => x.mark !== 'ok').map(x => ({it:x.it, dir:x.dir})), 'Try again'); break;
+    case 'quit': try { speechSynthesis.cancel(); } catch(_){} writer = null; go('home'); break;
+    case 'say': say(C.dir === 'stroke' ? C.it.w : plain(C.it)); break;
+    case 'next': nextCard(); break;
+    case 'hint': hint(); break;
+    case 'showme': showMe(); break;
+    case 'paperShow': C.paperStage = 'check'; render(); { const el = $('reveal'); C.chars.forEach((x, k) => { const d = document.createElement('button'); d.className = 'slot'; d.style.cssText = 'width:84px;height:84px;cursor:pointer;border-style:solid'; d.setAttribute('aria-label', x.ch); el.appendChild(d); const w = HanziWriter.create(d, x.ch, {width:80, height:80, padding:6, showOutline:true, strokeColor: x.given ? '#9DB0BC' : '#123B57', charDataLoader:loader, renderer:'svg', delayBetweenStrokes:150, strokeAnimationSpeed:1.2}); if (!x.given) setTimeout(() => w.animateCharacter(), 700 * k); d.addEventListener('click', () => w.animateCharacter()); }); } break;
+    case 'paperMark': C.cstat = C.cstat.map(s => s === 'given' ? s : arg === 'ok' ? 'done' : 'shown'); finishCard(arg === 'ok' ? 'right' : 'shown'); break;
+    case 'letter': case 'bk': case 'tone': case 'nextsyl': pyKey(a, arg); break;
+    case 'pick': { if (C.status !== 'todo') break; const [k, i] = arg.split(',').map(Number); C.s = k; C.sel = i; e.stopPropagation(); render(); break; }
+    case 'sylbox': if (C.status === 'todo'){ C.s = +arg; C.sel = C.ans[C.s].letters.length - 1; render(); } break;
+    case 'check': checkPy(); break;
+  }
+});
+document.addEventListener('keydown', e => {
+  if (screen !== 'card' || !C || C.dir !== 'py' || C.status !== 'todo') return;
+  if (/^[a-z]$/.test(e.key)){ e.preventDefault(); pyKey('letter', e.key); }
+  else if (/^[0-4]$/.test(e.key)){ e.preventDefault(); pyKey('tone', e.key); }
+  else if (e.key === 'Backspace'){ e.preventDefault(); pyKey('bk'); }
+  else if (e.key === ' ' || e.key === 'Tab'){ e.preventDefault(); pyKey('nextsyl'); }
+  else if (e.key === 'Enter'){ e.preventDefault(); checkPy(); }
+});
+render();
+})();
+</script>
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});</script>
+</body>
+</html>

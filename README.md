@@ -25,3 +25,17 @@ Untimed column addition and subtraction, laid out like a worksheet.
 ## Offline
 
 Both games work offline after they have been opened once with internet (a service worker keeps a copy on the phone). Pages still update automatically whenever the phone is online.
+
+## Pearl Tingxie (`chinese.html`)
+
+Chinese spelling (听写) for the P1 1B lists, lessons 15 to 19. Every word is practised both ways:
+
+- **Write the word:** she sees the Hanyu Pinyin and hears the word, then writes the characters with her finger, stroke by stroke (or on paper, then checks against animated strokes). Characters in brackets on the school list are shown in grey and not tested.
+- **Write the pinyin:** she sees the characters and types the pinyin on a letter keyboard, then taps a letter and a tone to place the tone mark. It checks letters, tone and where the mark sits.
+- **Strokes (笔画):** she draws the named stroke inside an example character (横折弯 in 朵, 横折斜钩 in 风, 斜钩 in 我, 卧钩 in 心).
+- **Mock 听写:** one lesson exactly as the school tests it, scored out of the total.
+- **Tricky words:** anything missed comes back until it is right 2 times in a row on 2 different days.
+
+Pinyin for section 二 words is not on the school list, so standard Hanyu Pinyin is used; common alternatives (like xué sheng / xué shēng) are accepted.
+
+Character drawing uses [Hanzi Writer](https://hanziwriter.org) (MIT, see `LICENSE-hanzi-writer.txt`) with stroke data from hanzi-writer-data (Arphic Public License, see `ARPHICPL.TXT`). Both are bundled, so it works offline too.
